@@ -5,6 +5,26 @@ set -euo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 TARGET_DIR="$PWD"
 
+GIT_AUTHOR_NAME=""
+GIT_AUTHOR_EMAIL=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --author)
+      GIT_AUTHOR_NAME="$2"
+      shift 2
+      ;;
+    --email)
+      GIT_AUTHOR_EMAIL="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown option: $1"
+      exit 1
+      ;;
+  esac
+done
+
 ensure_git_repository() {
   if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     printf 'CHECK: Git repository detected.\n'
@@ -16,6 +36,25 @@ ensure_git_repository() {
   git init
 
   printf 'INIT: Git repository created.\n'
+}
+
+configure_git_author() {
+  if [[ -z "$GIT_AUTHOR_NAME" && -z "$GIT_AUTHOR_EMAIL" ]]; then
+    printf 'SKIP: No Git author configuration specified.\n'
+    return 0
+  fi
+
+  printf 'CONFIG: Setting Git repository author information...\n'
+
+  if [[ -n "$GIT_AUTHOR_NAME" ]]; then
+    git config user.name "$GIT_AUTHOR_NAME"
+    printf 'CONFIG: user.name = %s\n' "$GIT_AUTHOR_NAME"
+  fi
+
+  if [[ -n "$GIT_AUTHOR_EMAIL" ]]; then
+    git config user.email "$GIT_AUTHOR_EMAIL"
+    printf 'CONFIG: user.email = %s\n' "$GIT_AUTHOR_EMAIL"
+  fi
 }
 
 copy_file_if_missing() {
@@ -136,6 +175,7 @@ initialize_speck_kit() {
 }
 
 ensure_git_repository
+configure_git_author
 
 copy_directory_contents "$SCRIPT_DIR/.github" "$TARGET_DIR/.github"
 copy_file_if_missing "$SCRIPT_DIR/AGENTS.md" "$TARGET_DIR/AGENTS.md"

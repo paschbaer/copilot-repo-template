@@ -2,21 +2,19 @@
 
 A reusable repository template for bootstrapping new projects with a consistent GitHub Copilot and Visual Studio Code configuration.
 
-This repository provides a predefined structure for:
+The repository provides a predefined structure for:
 
 - Repository-specific instructions in `AGENTS.md`
 - GitHub Copilot custom instructions
 - Custom agents
 - Agent skills
-- Prompt files (where required)
-- MCP (Model Context Protocol) server configuration
-- Shared development conventions and best practices
+- Prompt files, where required
+- MCP server configuration
+- Shared development conventions
 
-The goal is to ensure that every new repository starts with a consistent, maintainable, and AI-friendly development environment.
+The goal is to give new repositories a consistent and maintainable foundation for AI-assisted development.
 
----
-
-# Repository Structure
+## Repository Structure
 
 ```text
 .
@@ -31,180 +29,139 @@ The goal is to ensure that every new repository starts with a consistent, mainta
 └── install.sh
 ```
 
----
+## Installation
 
-# Getting Started
+Follow these steps to install the template configuration in a repository.
 
-Follow the steps below to create a new project using this template.
+### 1. Open a terminal
 
-## 1. Clone the Template Repository
+Open a terminal in the root directory of the repository that contains `install.sh`.
 
-Clone the template repository into your local workspace:
-
-```bash
-git clone https://github.com/<organization>/copilot-repo-template.git
-
-cd ..
-```
-
-Example workspace layout:
-
-```text
-workspace/
-└── copilot-repo-template/
-```
-
----
-
-## 2. Create a New Project Directory
-
-Create a new directory for your project next to the template repository:
+You can verify that you are in the correct directory by running:
 
 ```bash
-mkdir my-new-project
+ls -la install.sh
 ```
 
-Your workspace should now look similar to:
+The command should display the `install.sh` file.
 
-```text
-workspace/
-├── copilot-repo-template/
-└── my-new-project/
-```
+### 2. Make the installation script executable
 
----
-
-## 3. Change to the Project Directory
+On Linux, macOS, or another Unix-like environment, grant execute permission to the script:
 
 ```bash
-cd my-new-project
+chmod +x install.sh
 ```
 
----
+This step is normally required only once.
 
-## 4. Initialize a Git Repository (Optionally)
+### 3. Run the installation script
 
-If the directory is not already a Git repository, initialize one:
+Execute the script from the repository root:
 
 ```bash
-git init
+./install.sh
 ```
 
----
+This is the actual installation command. The `./` prefix tells the shell to execute `install.sh` from the current directory.
 
-## 5. Run the Installation Script
-
-Execute the installation script from the template repository:
+If you do not want to change the file permissions, you can alternatively invoke the script with Bash:
 
 ```bash
-../copilot-repo-template/install.sh
+bash install.sh
 ```
 
-If necessary, make the script executable first:
+To set the git attributes for *Author* and *E-Mail* call the script this way:
 
 ```bash
-chmod +x ../copilot-repo-template/install.sh
+../copilot-repo-template/install.sh \
+--author "paschbaer" \
+--email "paschbaer@users.noreply.github.com"
 ```
 
-Then run:
+### 4. Wait for the installation to finish
 
-```bash
-../copilot-repo-template/install.sh
-```
+The script installs or updates the repository-specific Copilot configuration. Depending on its implementation, this can include:
 
-The script will:
+- Creating or updating `AGENTS.md`
+- Installing Copilot custom instructions
+- Adding custom agents
+- Adding reusable agent skills
+- Adding prompt files
+- Configuring MCP servers
+- Applying shared repository conventions
 
-- Copy the Copilot configuration into the current repository
-- Preserve existing files
-- Install GitNexus if required
-- Initialize GitNexus
-- Install Spec Kit if required
-- Initialize Spec Kit
-- Configure agents, skills, prompts, and MCP integrations
+Review any messages printed by the script. If the script reports an error, resolve it before continuing.
 
----
+### 5. Review the resulting changes
 
-## 6. Review the Generated Files
-
-Inspect the generated repository:
+After the script has completed, inspect the repository status:
 
 ```bash
 git status
 ```
 
-Expected files include:
+Review the generated or modified files:
+
+```bash
+git diff
+```
+
+Pay particular attention to:
 
 ```text
 AGENTS.md
-.github/
-.vscode/
-.specify/
-.gitnexus/
+.github/copilot-instructions.md
+.github/agents/
+.github/prompts/
+.github/skills/
+.vscode/mcp.json
 ```
 
-Review all generated content before committing.
+Adjust the generated configuration if the repository requires project-specific rules, commands, or integrations.
 
----
+### 6. Validate the setup
 
-## 7. Commit the Initial Configuration
-
-```bash
-git add .
-git commit -m "chore: initialize Copilot configuration"
-```
-
----
-
-## 8. Open the Repository in Visual Studio Code
+Open the repository in Visual Studio Code:
 
 ```bash
 code .
 ```
 
-You can now use GitHub Copilot with the preconfigured agents, skills, instructions, and MCP integrations.
+Check that the expected agents, skills, instructions, prompts, and MCP servers are available in the Copilot integration.
 
----
+Never commit credentials, tokens, passwords, or other secrets. MCP configuration should reference environment variables or another approved secret-management mechanism.
 
-# Quick Start
+### 7. Commit the configuration
+
+Once the generated configuration has been reviewed and validated, commit it to the repository:
 
 ```bash
-git clone https://github.com/<organization>/copilot-repo-template.git
-
-mkdir my-new-project
-cd my-new-project
-
-git init
-
-chmod +x ../copilot-repo-template/install.sh
-../copilot-repo-template/install.sh
-
-git add .
-git commit -m "chore: initialize Copilot configuration"
-
-code .
+git add AGENTS.md .github .vscode
+git commit -m "chore: initialize Copilot repository configuration"
 ```
 
+The configuration is now versioned and can be shared with the rest of the team.
 
-# Quick Start
+## Quick Start
 
-For experienced users, the entire setup process is:
+If the repository has already been cloned and the terminal is open in its root directory, the complete installation consists of:
 
 ```bash
-git clone https://github.com/<organization>/<repository>.git
-cd <repository>
-
 chmod +x install.sh
 ./install.sh
+```
 
+Then review the resulting changes:
+
+```bash
 git status
 git diff
 ```
 
----
+## Updating the Configuration
 
-# Updating an Existing Repository
-
-To apply the latest template configuration to an existing repository, rerun the installation script:
+Run the installation script again when the template has been updated or the repository configuration needs to be refreshed:
 
 ```bash
 ./install.sh
@@ -212,103 +169,70 @@ To apply the latest template configuration to an existing repository, rerun the 
 
 Always review the resulting changes before committing them.
 
----
+## Troubleshooting
 
-# Troubleshooting
+### Permission denied
 
-## Permission Denied
-
-If the script cannot be executed:
-
-```bash
-Permission denied
-```
-
-Grant execute permissions and run it again:
+If the shell reports `Permission denied`, make the script executable and run it again:
 
 ```bash
 chmod +x install.sh
 ./install.sh
 ```
 
-Alternatively:
+Alternatively, invoke it directly with Bash:
 
 ```bash
 bash install.sh
 ```
 
----
+### Script not found
 
-## Script Not Found
-
-If the shell reports that the script cannot be found:
-
-```bash
-./install.sh: No such file or directory
-```
-
-Verify that you are in the repository root:
+If the shell reports that the script cannot be found, verify the current directory and the repository contents:
 
 ```bash
 pwd
 ls -la
 ```
 
-You should see:
+Change to the repository root before invoking the script:
 
-```text
-install.sh
+```bash
+cd /path/to/repository
+./install.sh
 ```
 
-before executing the script.
+### Windows
 
----
-
-## Windows
-
-Run the script using one of the following environments:
-
-- Windows Subsystem for Linux (WSL)
-- Git Bash
-- VS Code Integrated Terminal with Bash
-
-Example:
+Run the script from an environment that provides Bash, such as Windows Subsystem for Linux or Git Bash:
 
 ```bash
 bash install.sh
 ```
 
----
+## Customization
 
-# Customization
+After installation, the generated configuration can be adapted to the repository. Common customization points include:
 
-After installation, the generated configuration can be adapted to your project's requirements.
-
-Common customization points include:
-
-- Build and test commands in `AGENTS.md`
+- Build, test, lint, and formatting commands in `AGENTS.md`
 - Repository-wide rules in `.github/copilot-instructions.md`
-- Specialized agents in `.github/agents/`
+- Specialized roles in `.github/agents/`
 - Reusable workflows in `.github/skills/`
 - MCP server definitions in `.vscode/mcp.json`
 
-Repository-specific configuration should be committed to version control so that all team members share the same setup.
+Keep reusable defaults in the template and repository-specific information in the generated repository configuration.
 
----
+## Contributing
 
-# Contributing
+When changing this template:
 
-When updating this template:
+- Keep the setup deterministic and reproducible.
+- Avoid hardcoded machine-specific paths.
+- Never add credentials or secrets.
+- Keep generated files suitable for version control.
+- Document new agents, skills, MCP servers, and configuration options.
+- Test `install.sh` before publishing template changes.
 
-- Keep the setup deterministic and reproducible
-- Avoid machine-specific paths
-- Never include secrets or credentials
-- Keep generated files suitable for version control
-- Document all agents, skills, prompts, and MCP integrations
-- Test `install.sh` before publishing template changes
-
----
-
-# License
+## License
 
 See the repository license for details.
