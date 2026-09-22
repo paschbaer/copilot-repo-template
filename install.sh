@@ -180,6 +180,7 @@ configure_git_author
 copy_directory_contents "$SCRIPT_DIR/.github" "$TARGET_DIR/.github"
 copy_file_if_missing "$SCRIPT_DIR/AGENTS.md" "$TARGET_DIR/AGENTS.md"
 copy_directory_contents "$SCRIPT_DIR/.vscode" "$TARGET_DIR/.vscode"
+copy_directory_contents "$SCRIPT_DIR/memory-bank" "$TARGET_DIR/memory-bank"
 
 install_gitnexus
 initialize_gitnexus
