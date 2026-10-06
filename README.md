@@ -35,7 +35,7 @@ Follow these steps to install the template configuration in a repository.
 
 ### 1. Open a terminal
 
-Open a terminal in the root directory of the repository that contains `install.sh`.
+Clone this template repository locally (if you have not already) and open a terminal in its root directory, the directory that contains `install.sh`.
 
 You can verify that you are in the correct directory by running:
 
@@ -45,30 +45,48 @@ ls -la install.sh
 
 The command should display the `install.sh` file.
 
+In the examples below, `/path/to/copilot-repo-template` refers to this directory. Replace it with the actual path on your system.
+
 ### 2. Make the installation script executable
 
 On Linux, macOS, or another Unix-like environment, grant execute permission to the script:
 
 ```bash
-chmod +x install.sh
+chmod +x /path/to/copilot-repo-template/install.sh
 ```
 
 This step is normally required only once.
 
-### 3. Run the installation script
+### 3. Change into the repository directory
 
-Execute the script from the repository root:
+Change into the root directory of the repository you want to initialize with this template:
 
 ```bash
-./install.sh
+cd /path/to/your/target-repository
 ```
 
-This is the actual installation command. The `./` prefix tells the shell to execute `install.sh` from the current directory.
+Replace `/path/to/your/target-repository` with the actual path to the repository that should receive the template configuration. All subsequent steps must be run from this directory — the script installs the template configuration into the current working directory.
+
+### 4. Run the installation script
+
+Execute the script by its path in the template repository:
+
+```bash
+/path/to/copilot-repo-template/install.sh
+```
+
+If the template repository is a sibling directory of your target repository, a relative path works as well:
+
+```bash
+../copilot-repo-template/install.sh
+```
+
+This is the actual installation command. The script copies the template configuration from its own directory into the current working directory.
 
 If you do not want to change the file permissions, you can alternatively invoke the script with Bash:
 
 ```bash
-bash install.sh
+bash /path/to/copilot-repo-template/install.sh
 ```
 
 To set the git attributes for *Author* and *E-Mail* call the script this way:
@@ -79,7 +97,7 @@ To set the git attributes for *Author* and *E-Mail* call the script this way:
 --email "paschbaer@users.noreply.github.com"
 ```
 
-### 4. Wait for the installation to finish
+### 5. Wait for the installation to finish
 
 The script installs or updates the repository-specific Copilot configuration. Depending on its implementation, this can include:
 
@@ -93,7 +111,7 @@ The script installs or updates the repository-specific Copilot configuration. De
 
 Review any messages printed by the script. If the script reports an error, resolve it before continuing.
 
-### 5. Review the resulting changes
+### 6. Review the resulting changes
 
 After the script has completed, inspect the repository status:
 
@@ -120,7 +138,7 @@ AGENTS.md
 
 Adjust the generated configuration if the repository requires project-specific rules, commands, or integrations.
 
-### 6. Validate the setup
+### 7. Validate the setup
 
 Open the repository in Visual Studio Code:
 
@@ -132,7 +150,7 @@ Check that the expected agents, skills, instructions, prompts, and MCP servers a
 
 Never commit credentials, tokens, passwords, or other secrets. MCP configuration should reference environment variables or another approved secret-management mechanism.
 
-### 7. Commit the configuration
+### 8. Commit the configuration
 
 Once the generated configuration has been reviewed and validated, commit it to the repository:
 
@@ -145,11 +163,12 @@ The configuration is now versioned and can be shared with the rest of the team.
 
 ## Quick Start
 
-If the repository has already been cloned and the terminal is open in its root directory, the complete installation consists of:
+With the template cloned locally and the terminal in the root directory of the target repository, the complete installation consists of:
 
 ```bash
-chmod +x install.sh
-./install.sh
+chmod +x /path/to/copilot-repo-template/install.sh
+cd /path/to/your/target-repository
+/path/to/copilot-repo-template/install.sh
 ```
 
 Then review the resulting changes:
@@ -161,10 +180,10 @@ git diff
 
 ## Updating the Configuration
 
-Run the installation script again when the template has been updated or the repository configuration needs to be refreshed:
+Run the installation script again when the template has been updated or the repository configuration needs to be refreshed (from the target repository root):
 
 ```bash
-./install.sh
+/path/to/copilot-repo-template/install.sh
 ```
 
 Always review the resulting changes before committing them.
@@ -176,30 +195,30 @@ Always review the resulting changes before committing them.
 If the shell reports `Permission denied`, make the script executable and run it again:
 
 ```bash
-chmod +x install.sh
-./install.sh
+chmod +x /path/to/copilot-repo-template/install.sh
+/path/to/copilot-repo-template/install.sh
 ```
 
 Alternatively, invoke it directly with Bash:
 
 ```bash
-bash install.sh
+bash /path/to/copilot-repo-template/install.sh
 ```
 
 ### Script not found
 
-If the shell reports that the script cannot be found, verify the current directory and the repository contents:
+If the shell reports that the script cannot be found, verify the current directory and the template contents:
 
 ```bash
 pwd
-ls -la
+ls -la /path/to/copilot-repo-template/install.sh
 ```
 
-Change to the repository root before invoking the script:
+Change to the target repository root before invoking the script:
 
 ```bash
-cd /path/to/repository
-./install.sh
+cd /path/to/your/target-repository
+/path/to/copilot-repo-template/install.sh
 ```
 
 ### Windows
@@ -207,7 +226,7 @@ cd /path/to/repository
 Run the script from an environment that provides Bash, such as Windows Subsystem for Linux or Git Bash:
 
 ```bash
-bash install.sh
+bash /path/to/copilot-repo-template/install.sh
 ```
 
 ## Customization
