@@ -7,6 +7,8 @@ agent: Review Agent
 
 Review the provided change set and produce a findings-first report.
 
+**Fresh-context subagent requirement:** Do NOT perform the review directly in this conversation — your own context may be biased by prior discussion of the changes. Launch a general-purpose subagent with a fresh, empty context window and delegate the entire review to it. In the delegation prompt, include: the exact review scope (files/commit/branch), the full instructions below, and the requirement to read all relevant files from the current source without relying on any summary of them. Incorporate only the subagent's report into your final output; do not add findings you did not verify through the subagent.
+
 Before reviewing, independently verify the repository state with `git status --short --branch`, `git rev-parse HEAD`, `git diff`, and `git diff --cached`; for a committed change, also verify `git show <commit> --stat` and inspect the commit diff. If the repository state or requested scope does not match the requested review, report `REVIEW INCOMPLETE` and do not approve.
 
 Required format:
