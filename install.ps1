@@ -20,6 +20,7 @@ param(
     [string]$Email = "",
     [switch]$Venv,
     [switch]$Beads,
+    [switch]$Analyze,
     [switch]$Help
 )
 
@@ -29,9 +30,10 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $TargetDir = (Get-Location).Path
 
 function Write-Usage {
-    Write-Host "Usage: install.ps1 [-Author NAME] [-Email EMAIL] [-Venv] [-Beads]"
+    Write-Host "Usage: install.ps1 [-Author NAME] [-Email EMAIL] [-Venv] [-Beads] [-Analyze]"
     Write-Host "  -Venv     Run all uv/Python calls in a .venv inside the target repository."
     Write-Host "  -Beads    Install beads (bd) if missing, then run bd init and bd setup copilot."
+    Write-Host "  -Analyze  Also initialize GitNexus (gitnexus setup and gitnexus analyze) in the target repository."
 }
 
 if ($Help) {
@@ -478,7 +480,10 @@ Copy-DirectoryContents -SourceDir (Join-Path $ScriptDir 'memory-bank-template') 
 Ensure-Node
 
 Install-GitNexus
-Initialize-GitNexus
+
+if ($Analyze) {
+    Initialize-GitNexus
+}
 
 Ensure-Uv
 

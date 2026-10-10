@@ -108,6 +108,10 @@ To set the git attributes for *Author* and *E-Mail* call the script this way:
   --email "paschbaer@users.noreply.github.com"
 ```
 
+#### GitNexus initialization (`--analyze`)
+
+GitNexus is always installed when missing, but its initialization (`gitnexus setup` and `gitnexus analyze` in the target repository) runs only when `--analyze` is passed. Use it when the repository should be indexed for code-intelligence queries right away; omit it for a plain configuration install.
+
 #### Virtual environment mode (`--venv`)
 
 Add the `--venv` option to run all `uv`/Python calls in a virtual environment associated with the target repository:
@@ -188,8 +192,10 @@ powershell -ExecutionPolicy Bypass -File ..\copilot-repo-template\install.ps1
 Options mirror `install.sh`; PowerShell uses named parameters:
 
 ```powershell
-..\copilot-repo-template\install.ps1 -Author "paschbaer" -Email "paschbaer@users.noreply.github.com" -Venv -Beads
+..\copilot-repo-template\install.ps1 -Author "paschbaer" -Email "paschbaer@users.noreply.github.com" -Venv -Beads -Analyze
 ```
+
+`-Analyze` additionally initializes GitNexus (`gitnexus setup` and `gitnexus analyze`) in the target repository; without it, GitNexus is only installed, not initialized.
 
 Platform notes:
 

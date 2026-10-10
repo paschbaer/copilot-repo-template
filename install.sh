@@ -11,11 +11,13 @@ VENV_ENABLED=0
 VENV_DIR=""
 VENV_PYTHON=""
 BEADS_ENABLED=0
+ANALYZE_ENABLED=0
 
 usage() {
-  printf 'Usage: install.sh [--author NAME] [--email EMAIL] [--venv] [--beads]\n'
+  printf 'Usage: install.sh [--author NAME] [--email EMAIL] [--venv] [--beads] [--analyze]\n'
   printf '  --venv    Run all uv/Python calls in a .venv inside the target repository.\n'
   printf '  --beads   Install beads (bd) if missing, then run bd init and bd setup copilot.\n'
+  printf '  --analyze Also initialize GitNexus (gitnexus setup and gitnexus analyze) in the target repository.\n'
 }
 
 while [[ $# -gt 0 ]]; do
@@ -36,6 +38,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --beads)
       BEADS_ENABLED=1
+      shift
+      ;;
+    --analyze)
+      ANALYZE_ENABLED=1
       shift
       ;;
     --help|-h)
@@ -407,7 +413,10 @@ copy_directory_contents "$SCRIPT_DIR/memory-bank-template" "$TARGET_DIR/memory-b
 ensure_node
 
 install_gitnexus
-initialize_gitnexus
+
+if [[ "$ANALYZE_ENABLED" -eq 1 ]]; then
+  initialize_gitnexus
+fi
 
 ensure_uv
 

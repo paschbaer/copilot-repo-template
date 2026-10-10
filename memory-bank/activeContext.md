@@ -37,7 +37,8 @@ Replace the placeholders in the Memory Bank with repository-specific information
 - PowerShell port workflow session session-bdb24391 running on branch `feature/install-powershell-port` (install.ps1 + README platform sections).
 - npm/npx bootstrap (fnm, lightest per-user Node install, hard abort on failure) added to both installers on branch `feature/npm-npx-bootstrap`.
 - guidance-product-refinement skill (v2.0.0) integrated into `.github/skills/` — English documentation only, German guide intentionally not taken over; README lists included skills.
-- Installers now mirror all skills to `.agents/skills/` in target repos (Zed support), branch `feature/zed-skills-mirror`. Implementation is complete, committed, and validated.
+- Installers now mirror all skills to `.agents/skills/` in target repos (Zed support), branch `feature/zed-skills-mirror`.
+- GitNexus initialization now opt-in via `--analyze`/`-Analyze` in both installers (installation still automatic). Implementation is complete, committed, and validated.
 
 ## Recent Decisions
 
