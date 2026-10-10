@@ -34,7 +34,8 @@ Replace the placeholders in the Memory Bank with repository-specific information
 - Guidance workflow cancelled by operator decision after infrastructure blocker (stale v1 config snapshot on the guidance server; see RW-011).
 - Guidance v2 config active (server restarted); --beads workflow session session-bbbf628c running on branch `feature/install-beads-option`.
 - --beads workflow COMPLETED (all gates passed incl. repository-analysis after indexing the repo into the gitnexus-server container). Working tree carries operator-created artifacts (AGENTS.md GitNexus section, CLAUDE.md, .claude/) from the operator's WSL bd/gitnexus live test — not committed by the agent.
-- PowerShell port workflow session session-bdb24391 running on branch `feature/install-powershell-port` (install.ps1 + README platform sections). Implementation is complete, committed, and validated.
+- PowerShell port workflow session session-bdb24391 running on branch `feature/install-powershell-port` (install.ps1 + README platform sections).
+- npm/npx bootstrap (fnm, lightest per-user Node install, hard abort on failure) added to both installers on branch `feature/npm-npx-bootstrap`. Implementation is complete, committed, and validated.
 
 ## Recent Decisions
 

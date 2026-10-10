@@ -138,6 +138,15 @@ With `--beads`:
 
 Note that `bd init` creates or updates `AGENTS.md`: the script copies its own `AGENTS.md` template first, and `bd init` extends it afterwards. The `.beads/` directory is intentionally not added to `.gitignore` — beads' default mode versions it through git.
 
+#### Node.js bootstrap (npm/npx)
+
+The script checks that both `npm` and `npx` are available. If either is missing, it bootstraps Node.js with [fnm](https://github.com/Schniz/fnm) — a single per-user binary that needs no administrator rights:
+
+1. `fnm` is installed with its official install script (`curl -fsSL https://fnm.vercel.app/install | bash`; the URL is printed before execution).
+2. `fnm install --lts` installs the current Node.js LTS release (which ships `npm` and `npx`) for the current user.
+
+If the bootstrap fails, the script aborts with an actionable error message — GitNexus requires npm. Install Node.js manually from https://nodejs.org to resolve it.
+
 #### uv bootstrap
 
 The script checks whether `uv` is installed. If it is missing, the script downloads and executes the official standalone installer:
@@ -162,7 +171,7 @@ Test-Path ..\copilot-repo-template\install.ps1
 
 The command should return `True`.
 
-Prerequisites: Git for Windows (`git`) and Node.js with npm (required for GitNexus).
+Prerequisites: Git for Windows (`git`). Node.js with `npm`/`npx` is bootstrapped automatically when missing — `fnm` is installed via winget (`Schniz.fnm`), then the Node.js LTS release is installed per user. Install Node.js manually (https://nodejs.org) only if the bootstrap fails (the script then aborts with an actionable error).
 
 ### 2. Run the installation script
 
@@ -186,6 +195,7 @@ Platform notes:
 
 - `-Venv` creates the same `.venv` in the target repository (uv-managed Python, never recreated); Spec Kit is installed via `uv pip install --python` and `specify init` runs through the venv entry point resolved from `Scripts\`.
 - `-Beads` checks for the `bd` CLI and, if missing, installs beads via winget (`GasTownHall.Beads`) with the npm fallback (`npm install --global @beads/bd`); `bd init` (skipped when `.beads/` exists) and `bd setup copilot` then run in the target repository, exactly as under Bash.
+- npm/npx are checked before GitNexus; when missing, Node.js is bootstrapped via fnm (winget `Schniz.fnm`, then `fnm install --lts`) — the lightest per-user install, no administrator rights.
 - `uv` is bootstrapped with the official Windows installer (`https://astral.sh/uv/install.ps1`, executed via `Invoke-RestMethod | Invoke-Expression`; the URL is printed before execution). On failure the script aborts in `-Venv` mode and warns otherwise, mirroring the Bash behavior.
 - Existing files are never overwritten.
 

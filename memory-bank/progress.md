@@ -82,3 +82,8 @@
 - New install.ps1 (repo root, PS 5.1-compatible, full feature parity: named params -Author/-Email/-Venv/-Beads, never-overwrite copies, GitNexus/uv/Spec-Kit bootstraps, -Venv and -Beads chains; winget id GasTownHall.Beads verified via winget search).
 - README restructured: Installation on Linux/macOS/WSL (Bash), Installation on Windows (PowerShell), shared review/validate/commit section, dual Quick Start, Windows troubleshooting.
 - Validation: AST parser 0 errors, -Help exit 0, unknown-arg exit 1, install.sh byte-identical.
+
+### npm/npx bootstrap via fnm
+
+- Both installers gained ensure_node/Ensure-Node: npm AND npx check; if either is missing, fnm is installed (official script on Unix, winget Schniz.fnm on Windows — id live-verified) and `fnm install --lts` bootstraps Node.js per user; hard abort with manual-install URL on failure (user decision 1A/2A).
+- README documents the Node bootstrap in both platform sections.

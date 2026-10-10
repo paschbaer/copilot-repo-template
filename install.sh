@@ -118,6 +118,59 @@ copy_directory_contents() {
   done < <(find "$source_dir" -type f -print0)
 }
 
+ensure_node() {
+  printf 'CHECK: Looking for an existing npm/npx installation...\n'
+
+  if command -v npm >/dev/null 2>&1 && command -v npx >/dev/null 2>&1; then
+    printf 'SKIP: npm and npx are already installed (%s).\n' "$(command -v npm)"
+    return 0
+  fi
+
+  printf 'INSTALL: npm/npx incomplete or missing. Bootstrapping Node.js via fnm (lightest per-user install)...\n'
+
+  if ! command -v fnm >/dev/null 2>&1; then
+    printf 'INSTALL: fnm was not found. Installing it with the official install script...\n'
+    printf 'INSTALL: https://fnm.vercel.app/install\n'
+
+    if command -v curl >/dev/null 2>&1; then
+      if ! curl -fsSL https://fnm.vercel.app/install | bash; then
+        printf 'WARNING: The fnm install script reported a failure.\n' >&2
+      fi
+    else
+      printf 'WARNING: curl is required for the fnm install script but was not found.\n' >&2
+    fi
+
+    export PATH="$HOME/.local/share/fnm:$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+  fi
+
+  if ! command -v fnm >/dev/null 2>&1; then
+    printf 'ERROR: fnm is required to bootstrap Node.js but could not be installed.\n' >&2
+    printf 'ERROR: Install Node.js manually (https://nodejs.org) and run this script again.\n' >&2
+    return 1
+  fi
+
+  printf 'INSTALL: Installing the Node.js LTS release via fnm...\n'
+  eval "$(fnm env --shell bash)"
+
+  if ! fnm install --lts; then
+    printf 'ERROR: fnm could not install the Node.js LTS release.\n' >&2
+    printf 'ERROR: Install Node.js manually (https://nodejs.org) and run this script again.\n' >&2
+    return 1
+  fi
+
+  fnm use lts-latest
+  fnm default lts-latest || true
+
+  if command -v npm >/dev/null 2>&1 && command -v npx >/dev/null 2>&1; then
+    printf 'INSTALL: Node.js bootstrap completed (npm at %s).\n' "$(command -v npm)"
+    return 0
+  fi
+
+  printf 'ERROR: npm/npx are still unavailable after the Node.js bootstrap.\n' >&2
+  printf 'ERROR: Install Node.js manually (https://nodejs.org) and run this script again.\n' >&2
+  return 1
+}
+
 install_gitnexus() {
   printf 'CHECK: Looking for an existing GitNexus installation...\n'
 
@@ -349,6 +402,8 @@ copy_file_if_missing "$SCRIPT_DIR/AGENTS.md" "$TARGET_DIR/AGENTS.md"
 copy_directory_contents "$SCRIPT_DIR/.vscode" "$TARGET_DIR/.vscode"
 copy_file_if_missing "$SCRIPT_DIR/.gitignore" "$TARGET_DIR/.gitignore"
 copy_directory_contents "$SCRIPT_DIR/memory-bank-template" "$TARGET_DIR/memory-bank"
+
+ensure_node
 
 install_gitnexus
 initialize_gitnexus

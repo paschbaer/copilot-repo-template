@@ -124,6 +124,62 @@ function Configure-GitAuthor {
     }
 }
 
+function Ensure-Node {
+    Write-Host "CHECK: Looking for an existing npm/npx installation..."
+
+    if ((Test-CommandAvailable -Name 'npm') -and (Test-CommandAvailable -Name 'npx')) {
+        Write-Host ("SKIP: npm and npx are already installed ({0})." -f (Get-Command npm).Source)
+        return
+    }
+
+    Write-Host "INSTALL: npm/npx incomplete or missing. Bootstrapping Node.js via fnm (lightest per-user install)..."
+
+    if (-not (Test-CommandAvailable -Name 'fnm')) {
+        Write-Host "INSTALL: fnm was not found. Installing it with winget..."
+        Write-Host "INSTALL: winget install --id Schniz.fnm --source winget"
+
+        try {
+            winget install --id Schniz.fnm --source winget --disable-interactivity --accept-package-agreements --accept-source-agreements
+        }
+        catch {
+            Write-Warning "The winget installation of fnm reported a failure."
+        }
+
+        # Refresh PATH from the machine and user environment (winget persists its links there).
+        $machinePath = [Environment]::GetEnvironmentVariable('Path', 'Machine')
+        $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+        $env:PATH = "$machinePath;$userPath"
+    }
+
+    if (-not (Test-CommandAvailable -Name 'fnm')) {
+        Write-Error "ERROR: fnm is required to bootstrap Node.js but could not be installed."
+        Write-Error "ERROR: Install Node.js manually (https://nodejs.org) and run this script again."
+        exit 1
+    }
+
+    Write-Host "INSTALL: Installing the Node.js LTS release via fnm..."
+    Invoke-Expression -Command (fnm env --shell powershell | Out-String)
+
+    fnm install --lts
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "ERROR: fnm could not install the Node.js LTS release."
+        Write-Error "ERROR: Install Node.js manually (https://nodejs.org) and run this script again."
+        exit 1
+    }
+
+    fnm use lts-latest
+    fnm default lts-latest
+
+    if ((Test-CommandAvailable -Name 'npm') -and (Test-CommandAvailable -Name 'npx')) {
+        Write-Host ("INSTALL: Node.js bootstrap completed (npm at {0})." -f (Get-Command npm).Source)
+        return
+    }
+
+    Write-Error "ERROR: npm/npx are still unavailable after the Node.js bootstrap."
+    Write-Error "ERROR: Install Node.js manually (https://nodejs.org) and run this script again."
+    exit 1
+}
+
 function Install-GitNexus {
     Write-Host "CHECK: Looking for an existing GitNexus installation..."
 
@@ -417,6 +473,8 @@ Copy-FileIfMissing -Source (Join-Path $ScriptDir 'AGENTS.md') -Target (Join-Path
 Copy-DirectoryContents -SourceDir (Join-Path $ScriptDir '.vscode') -TargetDirParam (Join-Path $TargetDir '.vscode')
 Copy-FileIfMissing -Source (Join-Path $ScriptDir '.gitignore') -Target (Join-Path $TargetDir '.gitignore')
 Copy-DirectoryContents -SourceDir (Join-Path $ScriptDir 'memory-bank-template') -TargetDirParam (Join-Path $TargetDir 'memory-bank')
+
+Ensure-Node
 
 Install-GitNexus
 Initialize-GitNexus
