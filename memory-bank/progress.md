@@ -87,3 +87,8 @@
 
 - Both installers gained ensure_node/Ensure-Node: npm AND npx check; if either is missing, fnm is installed (official script on Unix, winget Schniz.fnm on Windows — id live-verified) and `fnm install --lts` bootstraps Node.js per user; hard abort with manual-install URL on failure (user decision 1A/2A).
 - README documents the Node bootstrap in both platform sections.
+
+### guidance-product-refinement skill
+
+- Integrated from ../temp/guidance-product-refinement-skill-v2 into .github/skills/guidance-product-refinement (SKILL.md, references, templates, English user guide).
+- SKILL.md adjusted: German guide removed from Resources, Copilot `description` added to frontmatter; German documentation intentionally not taken over (operator decision).

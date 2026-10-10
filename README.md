@@ -383,6 +383,13 @@ Alternatively, run the Bash installer from an environment that provides Bash, su
 bash /path/to/copilot-repo-template/install.sh
 ```
 
+## Included Skills
+
+The template ships these agent skills in `.github/skills/` (available to GitHub Copilot in VS Code after installation):
+
+- `update-memory-bank`: updates the Memory Bank after substantial work.
+- `guidance-product-refinement`: interactive Product-to-Feature refinement (Product → Epic → Capability → Feature Candidate) and controlled Spec-Kit feature handoff with iterative generate/audit/revise cycles; see `.github/skills/guidance-product-refinement/docs/user-guide-en.md`.
+
 ## Customization
 
 After installation, the generated configuration can be adapted to the repository. Common customization points include:
