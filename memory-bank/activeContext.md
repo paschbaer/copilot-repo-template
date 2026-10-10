@@ -36,7 +36,8 @@ Replace the placeholders in the Memory Bank with repository-specific information
 - --beads workflow COMPLETED (all gates passed incl. repository-analysis after indexing the repo into the gitnexus-server container). Working tree carries operator-created artifacts (AGENTS.md GitNexus section, CLAUDE.md, .claude/) from the operator's WSL bd/gitnexus live test — not committed by the agent.
 - PowerShell port workflow session session-bdb24391 running on branch `feature/install-powershell-port` (install.ps1 + README platform sections).
 - npm/npx bootstrap (fnm, lightest per-user Node install, hard abort on failure) added to both installers on branch `feature/npm-npx-bootstrap`.
-- guidance-product-refinement skill (v2.0.0) integrated into `.github/skills/` — English documentation only, German guide intentionally not taken over; README lists included skills. Implementation is complete, committed, and validated.
+- guidance-product-refinement skill (v2.0.0) integrated into `.github/skills/` — English documentation only, German guide intentionally not taken over; README lists included skills.
+- Installers now mirror all skills to `.agents/skills/` in target repos (Zed support), branch `feature/zed-skills-mirror`. Implementation is complete, committed, and validated.
 
 ## Recent Decisions
 

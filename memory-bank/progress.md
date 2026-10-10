@@ -92,3 +92,4 @@
 
 - Integrated from ../temp/guidance-product-refinement-skill-v2 into .github/skills/guidance-product-refinement (SKILL.md, references, templates, English user guide).
 - SKILL.md adjusted: German guide removed from Resources, Copilot `description` added to frontmatter; German documentation intentionally not taken over (operator decision).
+- Installers mirror `.github/skills` to `.agents/skills` (Zed convention, never-overwrite); README review/commit lists extended.

@@ -472,6 +472,7 @@ Copy-DirectoryContents -SourceDir (Join-Path $ScriptDir '.github') -TargetDirPar
 Copy-FileIfMissing -Source (Join-Path $ScriptDir 'AGENTS.md') -Target (Join-Path $TargetDir 'AGENTS.md')
 Copy-DirectoryContents -SourceDir (Join-Path $ScriptDir '.vscode') -TargetDirParam (Join-Path $TargetDir '.vscode')
 Copy-FileIfMissing -Source (Join-Path $ScriptDir '.gitignore') -Target (Join-Path $TargetDir '.gitignore')
+Copy-DirectoryContents -SourceDir (Join-Path $ScriptDir '.github/skills') -TargetDirParam (Join-Path $TargetDir '.agents/skills')
 Copy-DirectoryContents -SourceDir (Join-Path $ScriptDir 'memory-bank-template') -TargetDirParam (Join-Path $TargetDir 'memory-bank')
 
 Ensure-Node

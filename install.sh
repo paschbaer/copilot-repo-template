@@ -401,6 +401,7 @@ copy_directory_contents "$SCRIPT_DIR/.github" "$TARGET_DIR/.github"
 copy_file_if_missing "$SCRIPT_DIR/AGENTS.md" "$TARGET_DIR/AGENTS.md"
 copy_directory_contents "$SCRIPT_DIR/.vscode" "$TARGET_DIR/.vscode"
 copy_file_if_missing "$SCRIPT_DIR/.gitignore" "$TARGET_DIR/.gitignore"
+copy_directory_contents "$SCRIPT_DIR/.github/skills" "$TARGET_DIR/.agents/skills"
 copy_directory_contents "$SCRIPT_DIR/memory-bank-template" "$TARGET_DIR/memory-bank"
 
 ensure_node

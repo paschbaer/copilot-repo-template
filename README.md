@@ -212,7 +212,7 @@ The script installs or updates the repository-specific Copilot configuration. De
 - Creating or updating `AGENTS.md`
 - Installing Copilot custom instructions
 - Adding custom agents
-- Adding reusable agent skills
+- Adding reusable agent skills (`.github/skills/` for Copilot, mirrored to `.agents/skills/` for Zed)
 - Adding prompt files
 - Installing the Memory Bank templates from `memory-bank-template/` into `memory-bank/`
 - Configuring MCP servers
@@ -242,6 +242,7 @@ AGENTS.md
 .github/agents/
 .github/prompts/
 .github/skills/
+.agents/skills/
 .vscode/mcp.json
 .vscode/tasks.json
 memory-bank/
@@ -268,7 +269,7 @@ Never commit credentials, tokens, passwords, or other secrets. MCP configuration
 Once the generated configuration has been reviewed and validated, commit it to the repository:
 
 ```bash
-git add AGENTS.md .github .vscode memory-bank .gitignore
+git add AGENTS.md .github .agents .vscode memory-bank .gitignore
 git commit -m "chore: initialize Copilot repository configuration"
 ```
 
@@ -385,7 +386,7 @@ bash /path/to/copilot-repo-template/install.sh
 
 ## Included Skills
 
-The template ships these agent skills in `.github/skills/` (available to GitHub Copilot in VS Code after installation):
+The template ships these agent skills (available to GitHub Copilot in VS Code via `.github/skills/` and to Zed via `.agents/skills/` — the installers mirror all skills into both locations):
 
 - `update-memory-bank`: updates the Memory Bank after substantial work.
 - `guidance-product-refinement`: interactive Product-to-Feature refinement (Product → Epic → Capability → Feature Candidate) and controlled Spec-Kit feature handoff with iterative generate/audit/revise cycles; see `.github/skills/guidance-product-refinement/docs/user-guide-en.md`.
