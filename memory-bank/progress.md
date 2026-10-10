@@ -76,3 +76,9 @@
 
 - Added `--beads` flag with `install_beads()` (official install script with checksum verification, npm fallback, hard abort on double failure) and `initialize_beads()` (`bd init` skipped when `.beads/` exists, then always `bd setup copilot`).
 - README documents the option incl. AGENTS.md ordering note; RW-010 extended to cover --beads.
+
+### install.ps1: PowerShell port
+
+- New install.ps1 (repo root, PS 5.1-compatible, full feature parity: named params -Author/-Email/-Venv/-Beads, never-overwrite copies, GitNexus/uv/Spec-Kit bootstraps, -Venv and -Beads chains; winget id GasTownHall.Beads verified via winget search).
+- README restructured: Installation on Linux/macOS/WSL (Bash), Installation on Windows (PowerShell), shared review/validate/commit section, dual Quick Start, Windows troubleshooting.
+- Validation: AST parser 0 errors, -Help exit 0, unknown-arg exit 1, install.sh byte-identical.

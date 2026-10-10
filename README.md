@@ -23,6 +23,7 @@ The goal is to give new repositories a consistent and maintainable foundation fo
 ├── LICENSE
 ├── README.md
 ├── install.sh
+├── install.ps1
 ├── .gitignore
 ├── .github/
 │   ├── copilot-instructions.md
@@ -37,11 +38,11 @@ The goal is to give new repositories a consistent and maintainable foundation fo
 └── memory-bank-template/
 ```
 
-`memory-bank-template/` contains the distributable Memory Bank templates that `install.sh` copies into the target repository's `memory-bank/` directory. `memory-bank/` in this repository is this template project's own Memory Bank and is not installed.
+`memory-bank-template/` contains the distributable Memory Bank templates that `install.sh` (Linux/macOS/WSL) and `install.ps1` (Windows) copy into the target repository's `memory-bank/` directory. `memory-bank/` in this repository is this template project's own Memory Bank and is not installed.
 
-## Installation
+## Installation on Linux / macOS / WSL (Bash)
 
-Follow these steps to install the template configuration in a repository.
+Follow these steps to install the template configuration in a repository using the Bash installer `install.sh`.
 
 ### 1. Open a terminal
 
@@ -147,7 +148,54 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 Note that this pipes a remote script from `https://astral.sh` into `sh`; the URL is fixed and printed before execution. If the installation fails and `--venv` was requested, the script aborts with an actionable error message; without `--venv` it warns and continues (Spec Kit then falls back to pipx or pip).
 
-### 5. Wait for the installation to finish
+## Installation on Windows (PowerShell)
+
+The template ships a PowerShell port, `install.ps1`, with full feature parity to `install.sh`. It runs on Windows PowerShell 5.1 and PowerShell 7+.
+
+### 1. Open a terminal
+
+Open PowerShell in the root directory of the repository you want to initialize with this template. Verify that the template is available as a sibling directory:
+
+```powershell
+Test-Path ..\copilot-repo-template\install.ps1
+```
+
+The command should return `True`.
+
+Prerequisites: Git for Windows (`git`) and Node.js with npm (required for GitNexus).
+
+### 2. Run the installation script
+
+```powershell
+..\copilot-repo-template\install.ps1
+```
+
+If script execution is restricted by policy, run it with an execution-policy bypass for this process only:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File ..\copilot-repo-template\install.ps1
+```
+
+Options mirror `install.sh`; PowerShell uses named parameters:
+
+```powershell
+..\copilot-repo-template\install.ps1 -Author "paschbaer" -Email "paschbaer@users.noreply.github.com" -Venv -Beads
+```
+
+Platform notes:
+
+- `-Venv` creates the same `.venv` in the target repository (uv-managed Python, never recreated); Spec Kit is installed via `uv pip install --python` and `specify init` runs through the venv entry point resolved from `Scripts\`.
+- `-Beads` checks for the `bd` CLI and, if missing, installs beads via winget (`GasTownHall.Beads`) with the npm fallback (`npm install --global @beads/bd`); `bd init` (skipped when `.beads/` exists) and `bd setup copilot` then run in the target repository, exactly as under Bash.
+- `uv` is bootstrapped with the official Windows installer (`https://astral.sh/uv/install.ps1`, executed via `Invoke-RestMethod | Invoke-Expression`; the URL is printed before execution). On failure the script aborts in `-Venv` mode and warns otherwise, mirroring the Bash behavior.
+- Existing files are never overwritten.
+
+### 3. Continue with the shared steps
+
+Wait for the script to finish, then follow the shared review, validation, and commit steps below — they apply to both platforms.
+
+## Reviewing, Validating, and Committing (both platforms)
+
+### 1. Wait for the installation to finish
 
 The script installs or updates the repository-specific Copilot configuration. Depending on its implementation, this can include:
 
@@ -162,7 +210,7 @@ The script installs or updates the repository-specific Copilot configuration. De
 
 Review any messages printed by the script. If the script reports an error, resolve it before continuing.
 
-### 6. Review the resulting changes
+### 2. Review the resulting changes
 
 After the script has completed, inspect the repository status:
 
@@ -193,7 +241,7 @@ Note: `.vscode/tasks.json` defines a background task that runs GitHub Copilot wi
 
 Adjust the generated configuration if the repository requires project-specific rules, commands, or integrations.
 
-### 7. Validate the setup
+### 3. Validate the setup
 
 Open the repository in Visual Studio Code:
 
@@ -205,7 +253,7 @@ Check that the expected agents, skills, instructions, prompts, and MCP servers a
 
 Never commit credentials, tokens, passwords, or other secrets. MCP configuration should reference environment variables or another approved secret-management mechanism.
 
-### 8. Commit the configuration
+### 4. Commit the configuration
 
 Once the generated configuration has been reviewed and validated, commit it to the repository:
 
@@ -220,10 +268,19 @@ The configuration is now versioned and can be shared with the rest of the team.
 
 With the template cloned locally and the terminal in the root directory of the target repository, the complete installation consists of:
 
+Linux / macOS / WSL (Bash):
+
 ```bash
 chmod +x /path/to/copilot-repo-template/install.sh
 cd /path/to/your/target-repository
 /path/to/copilot-repo-template/install.sh
+```
+
+Windows (PowerShell):
+
+```powershell
+cd \path\to\your\target-repository
+..\copilot-repo-template\install.ps1
 ```
 
 Then review the resulting changes:
@@ -296,9 +353,21 @@ cd /path/to/your/target-repository
 /path/to/copilot-repo-template/install.sh
 ```
 
-### Windows
+### Windows (PowerShell)
 
-Run the script from an environment that provides Bash, such as Windows Subsystem for Linux or Git Bash:
+Use the native PowerShell port:
+
+```powershell
+..\copilot-repo-template\install.ps1
+```
+
+If execution is restricted by policy:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File ..\copilot-repo-template\install.ps1
+```
+
+Alternatively, run the Bash installer from an environment that provides Bash, such as Windows Subsystem for Linux or Git Bash:
 
 ```bash
 bash /path/to/copilot-repo-template/install.sh
