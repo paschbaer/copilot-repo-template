@@ -22,7 +22,17 @@ For every tracked follow-up, include:
 
 ## Open Follow-Ups
 
-None yet.
+- **ID:** RW-010 (tracked)
+  **Finding:** No full-run smoke test of install.sh (uv bootstrap + --venv) was executed — a full run would trigger npm global install and the uv installer on the development host.
+  **Trigger point:** First real installation of the template into a scratch or actual target repository.
+  **Action:** Run install.sh --venv in a scratch repo; verify .venv creation, uv pip install of specify-cli, specify invocation via the venv entry point; remove this entry afterwards.
+  **Status:** Open
+
+- **ID:** RW-011 (tracked)
+  **Finding:** The guidance workflow session for the install.sh extension was cancelled after formal completion kept failing on infrastructure (guidance server served a stale v1 config snapshot; requires server restart to pick up the committed v2 http-docker config).
+  **Trigger point:** Next guidance workflow session for this repository (after a guidance server restart).
+  **Action:** Verify the server picks up configurationVersion v2 (no query-project-insights op, host.docker.internal URLs); optionally re-run the workflow completion for this feature.
+  **Status:** Open
 
 ## Handled Follow-Ups
 

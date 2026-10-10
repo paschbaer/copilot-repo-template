@@ -30,6 +30,8 @@ Replace the placeholders in the Memory Bank with repository-specific information
 - Added `remaining-work-plan.md` (template and instance); the pre-existing §7 reference became valid, and a §5 table row was added.
 - Added the "Ask, Don't Assume" rule to `AGENTS.md` §1.
 - Fixed all post-commit review findings RW-001 to RW-009 (see `remaining-work-plan.md`).
+- Guidance workflow session active: install.sh extension (uv bootstrap + --venv option) on branch `feature/install-uv-venv`.
+- Guidance workflow cancelled by operator decision after infrastructure blocker (stale v1 config snapshot on the guidance server; see RW-011). Implementation is complete, committed, and validated.
 
 ## Recent Decisions
 

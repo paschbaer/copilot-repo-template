@@ -1,0 +1,124 @@
+{
+  "version": 2,
+  "operations": {
+    "build": {
+      "description": "Syntax-check install.sh — repository adaptation of the generated npm build gate: this repository is a configuration template with no build step, so the bash syntax check is the strongest automated validation available.",
+      "type": "process",
+      "executable": "bash",
+      "args": [
+        "-n",
+        "install.sh"
+      ],
+      "required": true,
+      "timeoutSeconds": 600,
+      "riskClass": "workspace_write",
+      "validation": {
+        "protocolRequestMustSucceed": true,
+        "exitCodeMustBeZero": true
+      },
+      "output": {
+        "returnToAgent": "summary_and_errors",
+        "retainRawResult": true
+      }
+    },
+    "deps-install": {
+      "description": "Install Node dependencies: npm ci (clean semantics), with npm install as the firstAvailable fallback — the fallback runs whenever the clean strategy fails for ANY reason (missing lockfile, lockfile out of sync, network error, dependency conflict, timeout). npm ci removes node_modules before failing, so a masked failure leaves node_modules deleted. Runs in the workspace root; the result's via label records which strategy ran (audit note; visible in run history). riskClass workspace_write (subject to policies.approvals — default: allowed for unattended operation), exposure-filtered output (specs/015 FR-1211).",
+      "type": "composite",
+      "strategy": "firstAvailable",
+      "required": false,
+      "invocableByAgent": true,
+      "timeoutSeconds": 900,
+      "riskClass": "workspace_write",
+      "steps": [
+        {
+          "type": "process",
+          "capability": "npm-ci-lockfile",
+          "executable": "npm",
+          "args": [
+            "ci"
+          ]
+        },
+        {
+          "type": "process",
+          "capability": "npm-install-fallback",
+          "executable": "npm",
+          "args": [
+            "install"
+          ]
+        }
+      ],
+      "validation": {
+        "protocolRequestMustSucceed": true,
+        "exitCodeMustBeZero": true
+      },
+      "output": {
+        "returnToAgent": "summary_and_errors",
+        "retainRawResult": true
+      }
+    },
+    "deps-reinstall": {
+      "description": "Clean Node dependencies: delete node_modules (lockfile preserved), then reinstall with npm — workspace-scoped (runs in the workspace root, no path traversal). For native-addon ABI mismatches (ERR_DLOPEN_FAILED): reinstall INSIDE the container for a Linux-native tree. Platform note: spawns npm directly (no shell) — supported on Linux/container hosts (FR-1216); Windows hosts are not supported without shell adaptation. riskClass workspace_write (subject to policies.approvals — default: allowed for unattended operation), exposure-filtered output (specs/015 FR-1212).",
+      "type": "process",
+      "executable": "node",
+      "args": [
+        "-e",
+        "const cp=require('node:child_process'),fs=require('node:fs');fs.rmSync('node_modules',{recursive:true,force:true});const r=cp.spawnSync('npm',['install'],{stdio:'inherit'});process.exit(r.status??1)"
+      ],
+      "required": false,
+      "invocableByAgent": true,
+      "timeoutSeconds": 900,
+      "riskClass": "workspace_write",
+      "validation": {
+        "protocolRequestMustSucceed": true,
+        "exitCodeMustBeZero": true
+      },
+      "output": {
+        "returnToAgent": "summary_and_errors",
+        "retainRawResult": true
+      }
+    },
+    "repository-analysis": {
+      "description": "Verify the GitNexus index for this repo is present and queryable (HTTP mode: mcpTool check; stdio mode: local CLI refresh). The index REFRESH itself stays a host-side pre-complete step: the HTTP server exposes no analyze tool.",
+      "type": "composite",
+      "strategy": "firstAvailable",
+      "required": true,
+      "timeoutSeconds": 900,
+      "riskClass": "read_only",
+      "steps": [
+        {
+          "type": "mcpTool",
+          "server": "gitnexus",
+          "capability": "check",
+          "arguments": {
+            "mode": "fixed",
+            "value": {
+              "repo": "copilot-repo-template"
+            }
+          }
+        },
+        {
+          "type": "process",
+          "executable": "gitnexus",
+          "args": [
+            "analyze",
+            "--no-stats"
+          ]
+        }
+      ],
+      "validation": {
+        "protocolRequestMustSucceed": true,
+        "toolResultMustNotBeError": true,
+        "requiredContent": true
+      },
+      "output": {
+        "returnToAgent": "summary_and_errors",
+        "retainRawResult": true
+      },
+      "failure": {
+        "remainInPhase": true,
+        "allowManualRetry": true,
+        "reportToAgent": true
+      }
+    }
+  }
+}

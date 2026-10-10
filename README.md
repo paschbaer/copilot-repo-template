@@ -103,9 +103,33 @@ To set the git attributes for *Author* and *E-Mail* call the script this way:
 
 ```bash
 ../copilot-repo-template/install.sh \
---author "paschbaer" \
---email "paschbaer@users.noreply.github.com"
+  --author "paschbaer" \
+  --email "paschbaer@users.noreply.github.com"
 ```
+
+#### Virtual environment mode (`--venv`)
+
+Add the `--venv` option to run all `uv`/Python calls in a virtual environment associated with the target repository:
+
+```bash
+../copilot-repo-template/install.sh --venv
+```
+
+With `--venv`:
+
+- The script ensures `uv` is available (see below) and creates a `.venv` directory in the target repository root using an uv-managed Python interpreter. An existing `.venv` is never recreated.
+- Spec Kit (`specify-cli`) is installed into that virtual environment via `uv pip install` (instead of `uv tool install`) and `specify init` is invoked through the virtual environment's `specify` entry point.
+- Without `--venv`, behavior is unchanged: Spec Kit is installed via `uv tool install` (or pipx/pip as fallback) outside any project virtual environment.
+
+#### uv bootstrap
+
+The script checks whether `uv` is installed. If it is missing, the script downloads and executes the official standalone installer:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Note that this pipes a remote script from `https://astral.sh` into `sh`; the URL is fixed and printed before execution. If the installation fails and `--venv` was requested, the script aborts with an actionable error message; without `--venv` it warns and continues (Spec Kit then falls back to pipx or pip).
 
 ### 5. Wait for the installation to finish
 

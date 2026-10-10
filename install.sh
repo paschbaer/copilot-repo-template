@@ -7,9 +7,13 @@ TARGET_DIR="$PWD"
 
 GIT_AUTHOR_NAME=""
 GIT_AUTHOR_EMAIL=""
+VENV_ENABLED=0
+VENV_DIR=""
+VENV_PYTHON=""
 
 usage() {
-  printf 'Usage: install.sh [--author NAME] [--email EMAIL]\n'
+  printf 'Usage: install.sh [--author NAME] [--email EMAIL] [--venv]\n'
+  printf '  --venv    Run all uv/Python calls in a .venv inside the target repository.\n'
 }
 
 while [[ $# -gt 0 ]]; do
@@ -23,6 +27,10 @@ while [[ $# -gt 0 ]]; do
       [[ $# -ge 2 ]] || { printf 'ERROR: --email requires a value.\n' >&2; usage; exit 1; }
       GIT_AUTHOR_EMAIL="$2"
       shift 2
+      ;;
+    --venv)
+      VENV_ENABLED=1
+      shift
       ;;
     --help|-h)
       usage
@@ -137,8 +145,73 @@ initialize_gitnexus() {
   printf 'INIT: GitNexus initialization completed.\n'
 }
 
+ensure_uv() {
+  printf 'CHECK: Looking for an existing uv installation...\n'
+
+  if command -v uv >/dev/null 2>&1; then
+    printf 'SKIP: uv is already installed at %s.\n' "$(command -v uv)"
+    uv --version || true
+    return 0
+  fi
+
+  printf 'INSTALL: uv was not found. Installing it with the official standalone installer...\n'
+  printf 'INSTALL: https://astral.sh/uv/install.sh\n'
+
+  if command -v curl >/dev/null 2>&1; then
+    if ! curl -LsSf https://astral.sh/uv/install.sh | sh; then
+      printf 'WARNING: The uv installer reported a failure.\n' >&2
+    fi
+  else
+    printf 'WARNING: curl is required to install uv but was not found.\n' >&2
+  fi
+
+  export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+
+  if command -v uv >/dev/null 2>&1; then
+    printf 'INSTALL: uv installation completed (%s).\n' "$(command -v uv)"
+    return 0
+  fi
+
+  if [[ "$VENV_ENABLED" -eq 1 ]]; then
+    printf 'ERROR: uv is required for --venv but could not be installed.\n' >&2
+    printf 'ERROR: Install uv manually (https://docs.astral.sh/uv/getting-started/installation/) and run this script again.\n' >&2
+    return 1
+  fi
+
+  printf 'WARNING: uv could not be installed; continuing without it. Spec Kit will fall back to pipx or pip.\n' >&2
+}
+
+create_project_venv() {
+  VENV_DIR="$TARGET_DIR/.venv"
+
+  if [[ -d "$VENV_DIR" ]]; then
+    printf 'SKIP: Virtual environment already exists at %s.\n' "$VENV_DIR"
+  else
+    printf 'INIT: Creating virtual environment at %s (uv-managed Python)...\n' "$VENV_DIR"
+    uv venv "$VENV_DIR"
+    printf 'INIT: Virtual environment created.\n'
+  fi
+
+  if [[ -x "$VENV_DIR/bin/python" ]]; then
+    VENV_PYTHON="$VENV_DIR/bin/python"
+  elif [[ -x "$VENV_DIR/Scripts/python.exe" ]]; then
+    VENV_PYTHON="$VENV_DIR/Scripts/python.exe"
+  else
+    printf 'ERROR: No Python interpreter found inside %s.\n' "$VENV_DIR" >&2
+    return 1
+  fi
+
+  printf 'INIT: Using virtual environment interpreter %s.\n' "$VENV_PYTHON"
+}
+
 install_speck_kit() {
   printf 'CHECK: Looking for an existing Spec Kit installation...\n'
+
+  if [[ "$VENV_ENABLED" -eq 1 ]]; then
+    printf 'INSTALL: Installing Spec Kit into the virtual environment...\n'
+    uv pip install --python "$VENV_PYTHON" specify-cli
+    return 0
+  fi
 
   if command -v specify >/dev/null 2>&1; then
     printf 'SKIP: Spec Kit is already installed at %s.\n' "$(command -v specify)"
@@ -172,11 +245,24 @@ install_speck_kit() {
 initialize_speck_kit() {
   printf 'INIT: Initializing Spec Kit for GitHub Copilot...\n'
 
+  local specify_cmd="specify"
+
+  if [[ "$VENV_ENABLED" -eq 1 ]]; then
+    if [[ -x "$VENV_DIR/bin/specify" ]]; then
+      specify_cmd="$VENV_DIR/bin/specify"
+    elif [[ -x "$VENV_DIR/Scripts/specify.exe" ]]; then
+      specify_cmd="$VENV_DIR/Scripts/specify.exe"
+    else
+      printf 'ERROR: specify was not found in the virtual environment %s.\n' "$VENV_DIR" >&2
+      return 1
+    fi
+  fi
+
   (
     cd -- "$TARGET_DIR"
 
     if [[ ! -d ".specify" ]]; then
-      specify init --here --integration copilot
+      "$specify_cmd" init --here --integration copilot
     else
       printf 'SKIP: Spec Kit already appears to be initialized.\n'
     fi
@@ -196,6 +282,12 @@ copy_directory_contents "$SCRIPT_DIR/memory-bank-template" "$TARGET_DIR/memory-b
 
 install_gitnexus
 initialize_gitnexus
+
+ensure_uv
+
+if [[ "$VENV_ENABLED" -eq 1 ]]; then
+  create_project_venv
+fi
 
 install_speck_kit
 initialize_speck_kit

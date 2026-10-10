@@ -64,3 +64,10 @@
 - Added `memory-bank-template/` with clean templates and switched `install.sh` to it.
 - Added `remaining-work-plan.md` (template + instance) and the "Ask, Don't Assume" rule in `AGENTS.md`.
 - Fixed all review findings RW-001 to RW-009, including `install.sh` argument guards/usage and a shipped `.gitignore`.
+
+### install.sh: uv bootstrap and --venv option
+
+- Added `ensure_uv()` (official standalone installer, PATH refresh for `~/.local/bin` and `~/.cargo/bin`).
+- Added `--venv` flag: creates `.venv` via uv-managed Python, installs specify-cli with `uv pip install --python`, invokes specify via the venv entry point (portable bin/Scripts resolution).
+- Template `.gitignore` ships `.venv/`; README documents both features including the curl|sh security note.
+- Guidance config regenerated with operator-confirmed wizard answers (http-docker transport, insight off); workflow session cancelled after stale-config infrastructure blocker — follow-ups RW-010 (smoke test) and RW-011 (server restart) tracked.

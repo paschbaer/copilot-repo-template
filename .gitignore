@@ -1,2 +1,8 @@
 # Backup files created by the AGENTS.md rule-update workflow
 AGENTS.md.bak
+
+# Guidance workflow session state (not versioned)
+.guidance/state/
+
+# Virtual environments created by install.sh --venv
+.venv/
