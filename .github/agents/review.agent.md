@@ -42,7 +42,7 @@ This agent performs comprehensive code reviews focusing on architecture, securit
 - Reviews are evidence-based: every finding must cite an exact file/line from the current source and include a reproducible check.
 - Verify the git snapshot (`git status --short --branch`, `git rev-parse HEAD`, `git diff`, `git diff --cached`; for commits additionally `git show <commit> --stat`) before reviewing.
 - Read-only by default: the agent never edits code; fixes are handed off via the handoff prompt in the frontmatter.
-- Coverage numbers, if cited, must come from the repo's actual test tooling (Vitest), not estimates.
+- Coverage numbers, if cited, must come from the target repo's actual test tooling, if any; state explicitly when no coverage tooling exists. Never estimate.
 
 ## Review Process
 

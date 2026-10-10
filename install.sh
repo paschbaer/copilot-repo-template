@@ -8,18 +8,29 @@ TARGET_DIR="$PWD"
 GIT_AUTHOR_NAME=""
 GIT_AUTHOR_EMAIL=""
 
+usage() {
+  printf 'Usage: install.sh [--author NAME] [--email EMAIL]\n'
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --author)
+      [[ $# -ge 2 ]] || { printf 'ERROR: --author requires a value.\n' >&2; usage; exit 1; }
       GIT_AUTHOR_NAME="$2"
       shift 2
       ;;
     --email)
+      [[ $# -ge 2 ]] || { printf 'ERROR: --email requires a value.\n' >&2; usage; exit 1; }
       GIT_AUTHOR_EMAIL="$2"
       shift 2
       ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
     *)
-      echo "Unknown option: $1"
+      printf 'Unknown option: %s\n' "$1" >&2
+      usage
       exit 1
       ;;
   esac
@@ -180,7 +191,8 @@ configure_git_author
 copy_directory_contents "$SCRIPT_DIR/.github" "$TARGET_DIR/.github"
 copy_file_if_missing "$SCRIPT_DIR/AGENTS.md" "$TARGET_DIR/AGENTS.md"
 copy_directory_contents "$SCRIPT_DIR/.vscode" "$TARGET_DIR/.vscode"
-copy_directory_contents "$SCRIPT_DIR/memory-bank" "$TARGET_DIR/memory-bank"
+copy_file_if_missing "$SCRIPT_DIR/.gitignore" "$TARGET_DIR/.gitignore"
+copy_directory_contents "$SCRIPT_DIR/memory-bank-template" "$TARGET_DIR/memory-bank"
 
 install_gitnexus
 initialize_gitnexus

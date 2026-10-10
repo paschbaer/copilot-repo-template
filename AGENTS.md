@@ -3,6 +3,7 @@
 ## 1. Working Rules (Hard Rules)
 - **Strict Compliance**: Strictly adhere to all guidelines in AGENTS.md. Any deviation requires explicit user approval: (1) explain the reason, (2) request explicit consent, (3) document the approved deviation in AGENTS.md. This rule takes precedence over all others when conflicts arise.
 - **No Unrequested Changes**: After findings/analyses, the response is observation + solution options. Any corrective action — config edits, registry changes, file changes outside the given task — first requires a concrete confirmation from the user ("Should I do X?") and the agent waits. Ambiguity resolves to NOT acting. This overrides proactivity defaults.
+- **Ask, Don't Assume**: When requirements are unclear or a decision is pending, ask the user concretely: present the available action options with their trade-offs, name a recommendation, and wait for the user's answer before continuing. Do not decide unilaterally.
 - **File Deletion**: Ask for approval before deleting files you haven't created yourself.
 - **Communication**: Keep explanations concise.
 
@@ -18,7 +19,8 @@
 - **Baseline-aware testing:** Run focused tests first and label pre-existing full-suite failures separately to avoid attributing unrelated regressions to the current task.
 
 ## 3. Architecture
-- Keep strategy logic isolated by module responsibility (scanner/signal/risk/execution). Keep console output readable.
+- Keep responsibilities isolated by clear module boundaries.
+- Extend this section with project-specific implementation rules — see the prompt `.github/prompts/fill-agents-md.prompt.md`.
 
 ## 4. Git & Branch Management
 - **Feature branches:** When working on `main` or `develop`, always create a feature branch `feature/<meaningful-name>`; all code changes go there (use working trees for concurrent changes), never directly on `main`/`develop`.
@@ -41,12 +43,13 @@ Durable project knowledge in `memory-bank/`:
 | `activeContext.md` | Current focus, recent decisions, open questions, next actions |
 | `progress.md` | Status of completed, active, and planned work |
 | `lessonsLearned.md` | Reusable lessons from incidents, mistakes, experiments, successes |
+| `remaining-work-plan.md` | Tracked follow-ups from review findings and deferred work |
 
 **Before a task:** read `projectBrief.md`, `systemPatterns.md`, `techContext.md`, `activeContext.md`, `progress.md`; consult `productContext.md` for user-facing/domain changes; review `lessonsLearned.md` for prior experience.
 
 **After substantial work:**
 - Update `activeContext.md` with new state and next actions; also after every significant change.
-- Update `progress.md` ("What works", "What's left", "Current State") — required BEFORE marking a task completed or ending a session; provide a final summary in chat afterwards.
+- Update `progress.md` ("Overall Status", "Completed", "In Progress", "Planned") — required BEFORE marking a task completed or ending a session; provide a final summary in chat afterwards.
 - Update `systemPatterns.md` when architectural decisions change.
 - Update `lessonsLearned.md` when resolving a recurring bug, a recurring failing command, a difficult bug, a clever optimization, or a strategic architectural decision. Focus on *why* things failed and *how* to do them right next time.
 - After a confirmed bugfix, reflect on whether it is a recurring pattern or a non-obvious trap; if so, add a concise entry ("issue, root cause, preventive measure") to the "Avoid These Mistakes" section of `lessonsLearned.md`.
@@ -68,5 +71,5 @@ Durable project knowledge in `memory-bank/`:
 - A finding may only be removed when it is fixed with regression coverage or explicitly reclassified with evidence (e.g., verified false positive or subsumed by another change).
 
 ## 8. Rule Updates & Self-Evolution
-- **Rule updates:** BEFORE modifying AGENTS.md or any rule file: (1) back it up to `AGENTS.md.bak` (or `.clinerules.bak`), (2) verify the new rules don't contradict existing ones, (3) state in chat what changes are being made and why. If an update fails or causes logic loops, immediately offer to restore from the `.bak` file.
+- **Rule updates:** BEFORE modifying AGENTS.md or any rule file: (1) back it up to `AGENTS.md.bak`, (2) verify the new rules don't contradict existing ones, (3) state in chat what changes are being made and why. If an update fails or causes logic loops, immediately offer to restore from the `.bak` file.
 - **Self-evolution:** If a reasoning error or incomplete planning occurs, proactively suggest a Memory Bank Protocol update. After completing a complex task, analyze whether the existing rules were sufficient; if not, ask "Should I optimize the Memory Bank Protocol to avoid this mistake in the future?". The agent is authorized to propose new best practices discovered during work as permanent rules for future sessions.

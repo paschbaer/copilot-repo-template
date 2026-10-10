@@ -1,5 +1,7 @@
 # Progress
 
+> **Template notice:** This file is a template from `copilot-repo-template` and contains TODO placeholders. Replace the placeholders with repository-specific content — see `.github/prompts/fill-memory-bank.prompt.md`.
+
 ## Overall Status
 
 **Phase:** Initial setup
@@ -11,7 +13,6 @@
 - [x] Create the Memory Bank directory structure.
 - [x] Add baseline documents for product, architecture, technology, and delivery context.
 - [x] Add a reusable lessons-learned document.
-- [x] Add Copilot custom instructions and a starter skill.
 
 ## In Progress
 
@@ -50,17 +51,3 @@
 
 - Initialized the Memory Bank.
 - Added `lessonsLearned.md`.
-
-### Template Completion
-
-- Added `.github/copilot-instructions.md`.
-- Added starter skill `.github/skills/update-memory-bank/`.
-- Added prompt `.github/prompts/fill-memory-bank.prompt.md`.
-- Added prompt `.github/prompts/fill-agents-md.prompt.md`.
-- Added template banners to all `memory-bank-template/` files (the instance `memory-bank/` carries no banners).
-- Added an MIT license (`LICENSE`).
-- Corrected the README structure, fixed the `git add` example, and documented the Memory Bank workflow.
-- Removed leftovers from `AGENTS.md` (backup at `AGENTS.md.bak`).
-- Added `memory-bank-template/` with clean templates and switched `install.sh` to it.
-- Added `remaining-work-plan.md` (template + instance) and the "Ask, Don't Assume" rule in `AGENTS.md`.
-- Fixed all review findings RW-001 to RW-009, including `install.sh` argument guards/usage and a shipped `.gitignore`.

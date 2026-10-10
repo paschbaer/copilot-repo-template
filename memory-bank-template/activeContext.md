@@ -1,5 +1,7 @@
 # Active Context
 
+> **Template notice:** This file is a template from `copilot-repo-template` and contains TODO placeholders. Replace the placeholders with repository-specific content — see `.github/prompts/fill-memory-bank.prompt.md`.
+
 > This file describes the current working state. Keep it concise and update it after substantial work.
 
 ## Current Focus
@@ -20,22 +22,11 @@ Replace the placeholders in the Memory Bank with repository-specific information
 
 ## Recent Changes
 
-- Created the initial Memory Bank structure.
-- Added `lessonsLearned.md` for reusable insights.
-- Extended the template: Copilot custom instructions, starter skill `update-memory-bank`, Memory Bank banners, fill prompt, MIT license.
-- Corrected the README structure and documented the Memory Bank workflow (placeholders, fill prompt, skill).
-- Added the `fill-agents-md` prompt and documented it in the README.
-- Removed leftovers from `AGENTS.md` (trading-specific architecture rule, `.clinerules.bak`).
-- Separated distributable Memory Bank templates into `memory-bank-template/`; `memory-bank/` is now this repository's own instance; `install.sh` copies from the template folder.
-- Added `remaining-work-plan.md` (template and instance); the pre-existing §7 reference became valid, and a §5 table row was added.
-- Added the "Ask, Don't Assume" rule to `AGENTS.md` §1.
-- Fixed all post-commit review findings RW-001 to RW-009 (see `remaining-work-plan.md`).
+- TODO: Last substantial change
 
 ## Recent Decisions
 
-- The Memory Bank is version-controlled with the repository.
-- Durable context belongs in the Memory Bank, while task-specific details belong in issues or work items.
-- Secrets and sensitive data must never be stored in Memory Bank files.
+- TODO: Decision and rationale
 
 ## Open Questions
 

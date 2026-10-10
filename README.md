@@ -10,6 +10,7 @@ The repository provides a predefined structure for:
 - Agent skills
 - Prompt files, where required
 - MCP server configuration
+- A Memory Bank with knowledge templates in `memory-bank/`
 - Shared development conventions
 
 The goal is to give new repositories a consistent and maintainable foundation for AI-assisted development.
@@ -19,15 +20,24 @@ The goal is to give new repositories a consistent and maintainable foundation fo
 ```text
 .
 ├── AGENTS.md
+├── LICENSE
+├── README.md
+├── install.sh
+├── .gitignore
 ├── .github/
 │   ├── copilot-instructions.md
 │   ├── agents/
 │   ├── prompts/
 │   └── skills/
 ├── .vscode/
-│   └── mcp.json
-└── install.sh
+│   ├── mcp.json
+│   └── tasks.json
+├── .gitignore
+├── memory-bank/
+└── memory-bank-template/
 ```
+
+`memory-bank-template/` contains the distributable Memory Bank templates that `install.sh` copies into the target repository's `memory-bank/` directory. `memory-bank/` in this repository is this template project's own Memory Bank and is not installed.
 
 ## Installation
 
@@ -106,6 +116,7 @@ The script installs or updates the repository-specific Copilot configuration. De
 - Adding custom agents
 - Adding reusable agent skills
 - Adding prompt files
+- Installing the Memory Bank templates from `memory-bank-template/` into `memory-bank/`
 - Configuring MCP servers
 - Applying shared repository conventions
 
@@ -134,7 +145,11 @@ AGENTS.md
 .github/prompts/
 .github/skills/
 .vscode/mcp.json
+.vscode/tasks.json
+memory-bank/
 ```
+
+Note: `.vscode/tasks.json` defines a background task that runs GitHub Copilot with `--allow-all-tools` for post-commit reviews. Review this configuration before keeping it in repositories with stricter security requirements.
 
 Adjust the generated configuration if the repository requires project-specific rules, commands, or integrations.
 
@@ -155,7 +170,7 @@ Never commit credentials, tokens, passwords, or other secrets. MCP configuration
 Once the generated configuration has been reviewed and validated, commit it to the repository:
 
 ```bash
-git add AGENTS.md .github .vscode
+git add AGENTS.md .github .vscode memory-bank .gitignore
 git commit -m "chore: initialize Copilot repository configuration"
 ```
 
@@ -177,6 +192,26 @@ Then review the resulting changes:
 git status
 git diff
 ```
+
+## After Installation: Fill the Memory Bank
+
+The files in `memory-bank/` are templates. They contain TODO placeholders and begin with a template banner pointing to this task. Fill them with repository-specific content before they provide value:
+
+1. Run the prompt `.github/prompts/fill-memory-bank.prompt.md` from GitHub Copilot. It guides through all placeholders based on the repository contents and short interviews.
+2. Alternatively, fill the files manually; `memory-bank/README.md` describes the purpose of each file.
+3. Remove the template banner from each file once its placeholders are resolved.
+
+For ongoing maintenance, the repository includes the agent skill `.github/skills/update-memory-bank/`: after substantial work, it describes which Memory Bank files to update and which rules apply.
+
+## After Installation: Customize AGENTS.md
+
+The installed `AGENTS.md` contains general working rules but no project-specific context. Complete it with the prompt `.github/prompts/fill-agents-md.prompt.md`. It establishes:
+
+- A short repository description (two to three sentences)
+- The programming language used, including version and style guide
+- Basic implementation rules, such as dependency injection, defining interfaces, or writing unit tests
+
+The prompt preserves all existing rules, creates a backup (`AGENTS.md.bak`) before modifying, and interviews the user instead of inventing standards.
 
 ## Updating the Configuration
 
@@ -254,4 +289,4 @@ When changing this template:
 
 ## License
 
-See the repository license for details.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
