@@ -23,16 +23,16 @@ For every tracked follow-up, include:
 ## Open Follow-Ups
 
 - **ID:** RW-010 (tracked)
-  **Finding:** No full-run smoke test of install.sh (uv bootstrap + --venv) was executed — a full run would trigger npm global install and the uv installer on the development host.
-  **Trigger point:** First real installation of the template into a scratch or actual target repository.
-  **Action:** Run install.sh --venv in a scratch repo; verify .venv creation, uv pip install of specify-cli, specify invocation via the venv entry point; remove this entry afterwards.
-  **Status:** Open
+  **Finding:** No full-run smoke test of install.sh (uv bootstrap + --venv, and the --beads option) was executed — a full run would trigger npm global installs, the uv installer, and the beads installer on the development host.
+  **Trigger point:** First real installation of the template into a scratch or actual target repository (cover both bd-missing and bd-present paths for --beads).
+  **Action:** Run install.sh --venv --beads in a scratch repo; verify .venv creation, uv pip install of specify-cli, specify invocation via the venv entry point, beads installation or skip, bd init, and bd setup copilot; remove this entry afterwards.
+  **Status:** Partially handled — bd init behavior live-validated by the operator (AGENTS.md updated, CLAUDE.md/.claude created in this repo); install-chain smoke test still open.
 
-- **ID:** RW-011 (tracked)
+- **ID:** RW-011 (resolved)
   **Finding:** The guidance workflow session for the install.sh extension was cancelled after formal completion kept failing on infrastructure (guidance server served a stale v1 config snapshot; requires server restart to pick up the committed v2 http-docker config).
-  **Trigger point:** Next guidance workflow session for this repository (after a guidance server restart).
-  **Action:** Verify the server picks up configurationVersion v2 (no query-project-insights op, host.docker.internal URLs); optionally re-run the workflow completion for this feature.
-  **Status:** Open
+  **Trigger point:** Resolved — server restarted; the --beads session ran on v2.
+  **Action:** Verified: new sessions receive the v2 configuration (no v1-only operations, host.docker.internal URLs). REMAINING: the GitNexus server index for this repo lives in the gitnexus-server container at /tmp (docker cp copy); a future re-analysis should use a persistent mount or the /data/gitnexus storage.
+  **Status:** Handled (partial follow-up: persistent GitNexus index location)
 
 ## Handled Follow-Ups
 

@@ -121,6 +121,22 @@ With `--venv`:
 - Spec Kit (`specify-cli`) is installed into that virtual environment via `uv pip install` (instead of `uv tool install`) and `specify init` is invoked through the virtual environment's `specify` entry point.
 - Without `--venv`, behavior is unchanged: Spec Kit is installed via `uv tool install` (or pipx/pip as fallback) outside any project virtual environment.
 
+#### beads integration (`--beads`)
+
+Add the `--beads` option to install [beads](https://github.com/gastownhall/beads) — a graph issue tracker and persistent memory for coding agents — and set it up for GitHub Copilot:
+
+```bash
+../copilot-repo-template/install.sh --beads
+```
+
+With `--beads`:
+
+1. The script checks whether the `bd` CLI is available (`command -v bd`). If it is already installed, the installation is skipped.
+2. Otherwise beads is installed with the official install script (`curl -fsSL https://raw.githubusercontent.com/gastownhall/beads/main/scripts/install.sh | bash`; the URL is printed before execution and the script verifies release checksums). If the install script fails or `curl` is missing, the script falls back to `npm install --global @beads/bd`. If both paths fail, the script aborts with an actionable error.
+3. In the target repository the script runs `bd init` (skipped when a `.beads/` directory already exists) and then `bd setup copilot`.
+
+Note that `bd init` creates or updates `AGENTS.md`: the script copies its own `AGENTS.md` template first, and `bd init` extends it afterwards. The `.beads/` directory is intentionally not added to `.gitignore` — beads' default mode versions it through git.
+
 #### uv bootstrap
 
 The script checks whether `uv` is installed. If it is missing, the script downloads and executes the official standalone installer:

@@ -10,10 +10,12 @@ GIT_AUTHOR_EMAIL=""
 VENV_ENABLED=0
 VENV_DIR=""
 VENV_PYTHON=""
+BEADS_ENABLED=0
 
 usage() {
-  printf 'Usage: install.sh [--author NAME] [--email EMAIL] [--venv]\n'
+  printf 'Usage: install.sh [--author NAME] [--email EMAIL] [--venv] [--beads]\n'
   printf '  --venv    Run all uv/Python calls in a .venv inside the target repository.\n'
+  printf '  --beads   Install beads (bd) if missing, then run bd init and bd setup copilot.\n'
 }
 
 while [[ $# -gt 0 ]]; do
@@ -30,6 +32,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --venv)
       VENV_ENABLED=1
+      shift
+      ;;
+    --beads)
+      BEADS_ENABLED=1
       shift
       ;;
     --help|-h)
@@ -204,6 +210,70 @@ create_project_venv() {
   printf 'INIT: Using virtual environment interpreter %s.\n' "$VENV_PYTHON"
 }
 
+install_beads() {
+  printf 'CHECK: Looking for an existing beads installation...\n'
+
+  if command -v bd >/dev/null 2>&1; then
+    printf 'SKIP: beads is already installed at %s.\n' "$(command -v bd)"
+    bd version || true
+    return 0
+  fi
+
+  printf 'INSTALL: beads was not found. Installing it with the official install script...\n'
+  printf 'INSTALL: https://raw.githubusercontent.com/gastownhall/beads/main/scripts/install.sh\n'
+
+  if command -v curl >/dev/null 2>&1; then
+    if ! curl -fsSL https://raw.githubusercontent.com/gastownhall/beads/main/scripts/install.sh | bash; then
+      printf 'WARNING: The beads install script reported a failure.\n' >&2
+    fi
+  else
+    printf 'WARNING: curl is required for the beads install script but was not found.\n' >&2
+  fi
+
+  export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+
+  if command -v bd >/dev/null 2>&1; then
+    printf 'INSTALL: beads installation completed (%s).\n' "$(command -v bd)"
+    return 0
+  fi
+
+  if command -v npm >/dev/null 2>&1; then
+    printf 'INSTALL: Falling back to the npm installation of beads...\n'
+    if ! npm install --global @beads/bd; then
+      printf 'WARNING: The npm fallback installation of beads failed.\n' >&2
+    fi
+  else
+    printf 'WARNING: npm fallback unavailable (npm not found).\n' >&2
+  fi
+
+  if command -v bd >/dev/null 2>&1; then
+    printf 'INSTALL: beads installation completed (%s).\n' "$(command -v bd)"
+    return 0
+  fi
+
+  printf 'ERROR: beads could not be installed (install script and npm fallback failed).\n' >&2
+  printf 'ERROR: Install beads manually (https://github.com/gastownhall/beads) and run this script again.\n' >&2
+  return 1
+}
+
+initialize_beads() {
+  (
+    cd -- "$TARGET_DIR"
+
+    if [[ -d ".beads" ]]; then
+      printf 'SKIP: beads appears to be already initialized (.beads exists).\n'
+    else
+      printf 'INIT: Running bd init...\n'
+      bd init
+    fi
+
+    printf 'INIT: Running bd setup copilot...\n'
+    bd setup copilot
+  )
+
+  printf 'INIT: beads initialization completed.\n'
+}
+
 install_speck_kit() {
   printf 'CHECK: Looking for an existing Spec Kit installation...\n'
 
@@ -291,5 +361,10 @@ fi
 
 install_speck_kit
 initialize_speck_kit
+
+if [[ "$BEADS_ENABLED" -eq 1 ]]; then
+  install_beads
+  initialize_beads
+fi
 
 printf 'Copilot setup installation completed. Existing files were preserved.\n'

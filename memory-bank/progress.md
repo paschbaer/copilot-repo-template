@@ -71,3 +71,8 @@
 - Added `--venv` flag: creates `.venv` via uv-managed Python, installs specify-cli with `uv pip install --python`, invokes specify via the venv entry point (portable bin/Scripts resolution).
 - Template `.gitignore` ships `.venv/`; README documents both features including the curl|sh security note.
 - Guidance config regenerated with operator-confirmed wizard answers (http-docker transport, insight off); workflow session cancelled after stale-config infrastructure blocker — follow-ups RW-010 (smoke test) and RW-011 (server restart) tracked.
+
+### install.sh: --beads option
+
+- Added `--beads` flag with `install_beads()` (official install script with checksum verification, npm fallback, hard abort on double failure) and `initialize_beads()` (`bd init` skipped when `.beads/` exists, then always `bd setup copilot`).
+- README documents the option incl. AGENTS.md ordering note; RW-010 extended to cover --beads.
