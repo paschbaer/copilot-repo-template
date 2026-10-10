@@ -6,3 +6,6 @@ AGENTS.md.bak
 
 # Virtual environments created by install.sh --venv
 .venv/
+
+# Local tool caches
+.dirac-cache/

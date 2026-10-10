@@ -46,7 +46,7 @@
       "transport": {
         "type": "http",
         "http": {
-          "url": "http://host.docker.internal:4747/api/mcp"
+          "url": "http://gitnexus-server:4747/api/mcp"
         }
       },
       "capabilities": {
@@ -71,7 +71,7 @@
         }
       },
       "containerRoute": {
-        "url": "http://host.docker.internal:4747/api/mcp"
+        "url": "http://gitnexus-server:4747/api/mcp"
       }
     }
   }
