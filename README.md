@@ -393,15 +393,28 @@ bash /path/to/copilot-repo-template/install.sh
 
 ## Included Skills
 
-The template ships these agent skills (available to GitHub Copilot in VS Code via `.github/skills/` and to Zed via `.agents/skills/` — the installers mirror all skills into both locations, and this repository keeps its own `.agents/skills/` mirror in sync):
+The template ships seven agent skills. They are installed to `.github/skills/` (GitHub Copilot in VS Code) and mirrored to `.agents/skills/` (Zed); the installers keep both locations in sync, and this repository maintains its own mirror. Trigger a skill by naming it in the chat (e.g. "use guidance-setup") — both editors discover skills through the `name` and `description` frontmatter fields.
 
-- `update-memory-bank`: updates the Memory Bank after substantial work.
-- `guidance-product-refinement`: interactive Product-to-Feature refinement (Product → Epic → Capability → Feature Candidate) and controlled Spec-Kit feature handoff with iterative generate/audit/revise cycles; see `.github/skills/guidance-product-refinement/docs/user-guide-en.md`.
-- `guidance-plain-workflow`: starts a Guidance MCP workflow in the plain plan-driven mode (no Spec-Kit folder involved).
-- `guidance-speckit-tasks`: drives an existing Spec-Kit feature (`specs/<id>` artifacts) through evidence-gated task batches.
-- `guidance-speckit-development`: runs the full Spec-Kit SDD flow with fail-closed artifact gates per phase.
-- `guidance-setup`: creates a fresh `.guidance/` configuration via the configuration assistant — every wizard question asked one at a time, operator answers only.
-- `guidance-setup-adopt`: adopts the built-in reference `.guidance/` configuration (adopt mode); remaining questions one at a time, plus `.gitignore` state entry and GitNexus analyze reminder.
+### Setup and configuration
+
+- **`guidance-setup`** — creates a fresh `.guidance/` configuration for a repository via the Guidance configuration assistant. The agent runs `setup_guidance_start` and then asks every wizard question **one at a time**, waiting for your answer — nothing is answered on your behalf, no defaults are assumed. When the questionnaire completes, the generated files are written to the project root. Use when the repository has no Guidance configuration yet.
+- **`guidance-setup-adopt`** — same wizard flow, but adopts the proven built-in reference configuration (`configSource: adopt`, builtin reference) instead of generating everything from your answers: `insight`, `gitnexus`, and the gate preset derive from the template and are not asked. Additionally appends `.guidance/state/` to `.gitignore` and reminds you to run `gitnexus analyze --no-stats` afterwards.
+
+### Guided development workflows
+
+These three skills drive the Guidance MCP workflow server (the repository must be registered as a Guidance workspace). They cover the three modes of operation:
+
+- **`guidance-plain-workflow`** (Mode 1) — starts a plan-driven `standard-development` session for a normal change request and drives it through the phases (`understand` → `plan` → implementation review loops → `verify` → `complete`) using plan-level submissions. Use when there is **no** Spec-Kit feature folder involved.
+- **`guidance-speckit-tasks`** (Mode 2) — executes an **existing** Spec-Kit feature (`specs/<id>/` with `spec.md`, `plan.md`, `tasks.md`): imports the artifacts into a hash-pinned snapshot, then works through the tasks in evidence-gated batches (implement → review → verify → complete per task). A checked checkbox in `tasks.md` is a hint, never proof — evidence submissions are mandatory.
+- **`guidance-speckit-development`** (Mode 3) — runs a feature from scratch through the complete Spec-Kit SDD cycle (`specify` → `clarify` → `plan` → `checklist` → `tasks` → `analyze` → `implement` → `converge`) on the artifact-bound `spec-kit-development` workflow variant. Each phase exit is fail-closed: the gate blocks until the expected artifact exists and imports cleanly.
+
+### Product refinement
+
+- **`guidance-product-refinement`** — interactive Product-to-Feature refinement (Product → Epic Set → Capability Set → Feature Candidate Set) and the controlled handoff of an approved Feature Candidate into a Spec-Kit feature specification. Iterative generate/audit/revise cycles with persistent findings and revision history; approval is automatic only with zero open blocking findings and completed deterministic checks. Entry point: `references/initial-workflow-prompt.md` (one grouped questionnaire for blocking inputs, then all stages run automatically — no manual stage-prompt copying). See `docs/user-guide-en.md` inside the skill.
+
+### Memory Bank maintenance
+
+- **`update-memory-bank`** — updates the Memory Bank (`memory-bank/`) after substantial work: maps what changed (architecture, toolchain, progress, lessons) to the affected files, applies the maintenance rules, and reports which files were updated and why. Use after features, refactoring, bug fixes, or configuration changes; do not use for trivial edits.
 
 ## Customization
 
