@@ -25,6 +25,7 @@ The goal is to give new repositories a consistent and maintainable foundation fo
 ├── install.sh
 ├── install.ps1
 ├── .gitignore
+├── .agents/
 ├── .github/
 │   ├── copilot-instructions.md
 │   ├── agents/
@@ -392,10 +393,13 @@ bash /path/to/copilot-repo-template/install.sh
 
 ## Included Skills
 
-The template ships these agent skills (available to GitHub Copilot in VS Code via `.github/skills/` and to Zed via `.agents/skills/` — the installers mirror all skills into both locations):
+The template ships these agent skills (available to GitHub Copilot in VS Code via `.github/skills/` and to Zed via `.agents/skills/` — the installers mirror all skills into both locations, and this repository keeps its own `.agents/skills/` mirror in sync):
 
 - `update-memory-bank`: updates the Memory Bank after substantial work.
 - `guidance-product-refinement`: interactive Product-to-Feature refinement (Product → Epic → Capability → Feature Candidate) and controlled Spec-Kit feature handoff with iterative generate/audit/revise cycles; see `.github/skills/guidance-product-refinement/docs/user-guide-en.md`.
+- `guidance-plain-workflow`: starts a Guidance MCP workflow in the plain plan-driven mode (no Spec-Kit folder involved).
+- `guidance-speckit-tasks`: drives an existing Spec-Kit feature (`specs/<id>` artifacts) through evidence-gated task batches.
+- `guidance-speckit-development`: runs the full Spec-Kit SDD flow with fail-closed artifact gates per phase.
 
 ## Customization
 
