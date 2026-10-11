@@ -400,6 +400,8 @@ The template ships these agent skills (available to GitHub Copilot in VS Code vi
 - `guidance-plain-workflow`: starts a Guidance MCP workflow in the plain plan-driven mode (no Spec-Kit folder involved).
 - `guidance-speckit-tasks`: drives an existing Spec-Kit feature (`specs/<id>` artifacts) through evidence-gated task batches.
 - `guidance-speckit-development`: runs the full Spec-Kit SDD flow with fail-closed artifact gates per phase.
+- `guidance-setup-fresh`: creates a fresh `.guidance/` configuration via the configuration assistant — every wizard question asked one at a time, operator answers only.
+- `guidance-setup-adopt`: adopts the built-in reference `.guidance/` configuration (adopt mode); remaining questions one at a time, plus `.gitignore` state entry and GitNexus analyze reminder.
 
 ## Customization
 
