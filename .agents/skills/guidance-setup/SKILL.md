@@ -1,6 +1,6 @@
 ---
-name: guidance-setup-fresh
-description: Creates a fresh .guidance/ configuration for this project via the Guidance configuration assistant. Use when the user asks to "set up guidance", "create the guidance config", "guidance setup fresh", or wants a new configuration generated from their own answers. Asks every wizard question one at a time and waits for the operator's answer — never answers on their behalf and never assumes defaults.
+name: guidance-setup
+description: Creates a fresh .guidance/ configuration for this project via the Guidance configuration assistant. Use when the user asks to "set up guidance", "create the guidance config", "guidance setup", or wants a new configuration generated from their own answers. Asks every wizard question one at a time and waits for the operator's answer — never answers on their behalf and never assumes defaults.
 ---
 
 # Guidance Setup — Fresh Configuration
