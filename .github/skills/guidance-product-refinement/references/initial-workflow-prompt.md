@@ -81,7 +81,7 @@ PATH A - DIRECT SPEC-KIT FEATURE SPECIFICATION
 PATH B - HANDOFF TO /guidance-speckit-development
 1. Validate candidate approval and handoff eligibility (same criteria as PATH A).
 2. Build a self-contained feature request for the SDD cycle preserving requirements, constraints, non-goals, scenarios, and traceability from the approved Feature Candidate.
-3. Hand the prepared request over to `/guidance-speckit-development` (invoke the skill or its prompt with the request as input, or provide exactly one copy-ready invocation when direct invocation is unavailable).
+3. Hand the prepared request over to `/guidance-speckit-development` (invoke the skill or its prompt with the request as input, or provide exactly one copy-ready invocation when direct invocation is unavailable). When starting its workflow session, follow the target skill's workspace resolution rules: use the REGISTERED workspace name — never a display name or host path — and never brute-force `registry_register` with path variants.
 4. The SDD cycle, artifact gates, implementation, and verification are owned by guidance-speckit-development — do not duplicate or preempt its stages.
 5. Record the handoff (target, request digest, approval record) and report remaining external action.
 

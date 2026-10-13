@@ -10,6 +10,12 @@ The feature should go through the complete SDD cycle (specify → clarify →
 plan → checklist → tasks → analyze → implement → converge) with the workflow
 enforcing artifact existence at each phase exit.
 
+## Workspace resolution
+
+- `start_workflow` takes the workspace's REGISTERED NAME (kebab-case, e.g. `dcfamily`) — never a display name, a host path, or free text from the request.
+- Discover the registered name BEFORE calling: check prior run records, the repository's `.guidance/` configuration, or ask the operator. Do not guess.
+- If the workspace is not yet registered: `registry_register` requires the CONTAINER-visible absolute path — in pool/Docker mode `/workspaces/<repo>`. Windows drive paths (`d:\...`, `D:/...`), relative paths, and `file://` URIs are rejected — do NOT retry path variants; on failure, ask the operator for the registered name or the container path.
+
 ## Procedure
 1. Start WITH the variant id:
    `start_workflow { workspace: "<registered-name>", request: "<feature>",
