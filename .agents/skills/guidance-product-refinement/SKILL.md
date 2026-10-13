@@ -17,7 +17,7 @@ Use `references/initial-workflow-prompt.md`. It discovers available inputs, asks
 - Product → Epic Set
 - Epic → Capability Set
 - Capability → Feature Candidate Set
-- approved Feature Candidate → Spec-Kit Feature Specification
+- approved Feature Candidate → Spec-Kit Feature Specification **or** handoff to `/guidance-speckit-development` (operator choice)
 
 ## Mandatory Behavior
 
@@ -28,6 +28,7 @@ Use `references/initial-workflow-prompt.md`. It discovers available inputs, asks
 - English repository artifacts
 - Managed writes only inside the specification subrepository
 - No manual copying of internal stage prompts
+- At handoff, ask the operator which target to use (direct Spec-Kit feature specification or `/guidance-speckit-development`) unless the request already specifies one; WAIT for the answer — do not pick a target on the operator's behalf
 
 ## Resources
 

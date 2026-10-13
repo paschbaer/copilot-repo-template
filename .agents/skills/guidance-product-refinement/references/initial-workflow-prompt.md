@@ -41,7 +41,8 @@ REQUIRED HANDOFF INPUTS
 - approval record/digest and open findings
 - feature-to-speckit contract
 - relevant glossary/architecture context
-- Spec-Kit invocation mechanism and target path
+- handoff target: direct Spec-Kit feature specification OR /guidance-speckit-development (ask the operator when not specified; do not choose on their behalf)
+- Spec-Kit invocation mechanism and target path (direct target only)
 - maximum correction cycles, default 5
 - prior handoff state when resuming
 
@@ -65,7 +66,10 @@ PRODUCT REFINEMENT
 6. If approved, materialize the Child Set and hierarchy index inside the specification subrepository.
 7. Do not pause for confirmation between stages.
 
-SPEC-KIT FEATURE HANDOFF
+FEATURE HANDOFF (target selected by the operator)
+0. Determine the handoff target. If the request does not already specify one, ask the operator: direct Spec-Kit feature specification or /guidance-speckit-development. WAIT for the answer; do not proceed with an assumed target.
+
+PATH A - DIRECT SPEC-KIT FEATURE SPECIFICATION
 1. Validate candidate approval and handoff eligibility.
 2. Build a self-contained `/speckit.specify` input preserving requirements, constraints, non-goals, scenarios, and traceability.
 3. Invoke Spec-Kit when possible. Otherwise provide exactly one copy-ready invocation and identify required outputs.
@@ -73,6 +77,13 @@ SPEC-KIT FEATURE HANDOFF
 5. Audit requirement coverage, constraints, non-goals, scenarios, scope, assumptions, consistency, acceptance criteria, traceability, and contract conformity.
 6. While blocking findings remain, generate/apply a correction and repeat capture/audit.
 7. Auto-accept only after zero open blocking findings and successful deterministic checks.
+
+PATH B - HANDOFF TO /guidance-speckit-development
+1. Validate candidate approval and handoff eligibility (same criteria as PATH A).
+2. Build a self-contained feature request for the SDD cycle preserving requirements, constraints, non-goals, scenarios, and traceability from the approved Feature Candidate.
+3. Hand the prepared request over to `/guidance-speckit-development` (invoke the skill or its prompt with the request as input, or provide exactly one copy-ready invocation when direct invocation is unavailable).
+4. The SDD cycle, artifact gates, implementation, and verification are owned by guidance-speckit-development — do not duplicate or preempt its stages.
+5. Record the handoff (target, request digest, approval record) and report remaining external action.
 
 After every cycle report revision, blocking/warning/info counts, and next decision. At completion report status, run ID, cycles, findings, artifacts, approval/acceptance record, and remaining external action.
 

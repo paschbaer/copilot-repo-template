@@ -411,7 +411,7 @@ These three skills drive the Guidance MCP workflow server (the repository must b
 
 ### Product refinement
 
-- **`guidance-product-refinement`** — interactive Product-to-Feature refinement (Product → Epic Set → Capability Set → Feature Candidate Set) and the controlled handoff of an approved Feature Candidate into a Spec-Kit feature specification. Iterative generate/audit/revise cycles with persistent findings and revision history; approval is automatic only with zero open blocking findings and completed deterministic checks. Entry point: `references/initial-workflow-prompt.md` (one grouped questionnaire for blocking inputs, then all stages run automatically — no manual stage-prompt copying). See `docs/user-guide-en.md` inside the skill.
+- **`guidance-product-refinement`** — interactive Product-to-Feature refinement (Product → Epic Set → Capability Set → Feature Candidate Set) and the controlled handoff of an approved Feature Candidate. At handoff time the operator chooses the target: a direct Spec-Kit feature specification **or** a transition to `/guidance-speckit-development`, which then owns the complete SDD cycle. Iterative generate/audit/revise cycles with persistent findings and revision history; approval is automatic only with zero open blocking findings and completed deterministic checks. Entry point: `references/initial-workflow-prompt.md` (one grouped questionnaire for blocking inputs, then all stages run automatically — no manual stage-prompt copying). See `docs/user-guide-en.md` inside the skill.
 
 ### Memory Bank maintenance
 
