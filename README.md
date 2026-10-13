@@ -393,7 +393,7 @@ bash /path/to/copilot-repo-template/install.sh
 
 ## Included Skills
 
-The template ships seven agent skills. They are installed to `.github/skills/` (GitHub Copilot in VS Code) and mirrored to `.agents/skills/` (Zed); the installers keep both locations in sync, and this repository maintains its own mirror. Trigger a skill by naming it in the chat (e.g. "use guidance-setup") — both editors discover skills through the `name` and `description` frontmatter fields.
+The template ships eight agent skills. They are installed to `.github/skills/` (GitHub Copilot in VS Code) and mirrored to `.agents/skills/` (Zed); the installers keep both locations in sync, and this repository maintains its own mirror. Trigger a skill by naming it in the chat (e.g. "use guidance-setup") — both editors discover skills through the `name` and `description` frontmatter fields. In addition, `.github/prompts/` provides slash-command prompts for most skills (e.g. `/guidance-setup`, `/speckit-plan`) so they can be launched comfortably from the prompt menu. Note: the `speckit-*` prompts reference skills that are generated **at runtime** by the Spec Kit initialization (`specify init`) in the target repository — they do not exist in this template and become available after installation.
 
 ### Setup and configuration
 
@@ -407,6 +407,7 @@ These three skills drive the Guidance MCP workflow server (the repository must b
 - **`guidance-plain-workflow`** (Mode 1) — starts a plan-driven `standard-development` session for a normal change request and drives it through the phases (`understand` → `plan` → implementation review loops → `verify` → `complete`) using plan-level submissions. Use when there is **no** Spec-Kit feature folder involved.
 - **`guidance-speckit-tasks`** (Mode 2) — executes an **existing** Spec-Kit feature (`specs/<id>/` with `spec.md`, `plan.md`, `tasks.md`): imports the artifacts into a hash-pinned snapshot, then works through the tasks in evidence-gated batches (implement → review → verify → complete per task). A checked checkbox in `tasks.md` is a hint, never proof — evidence submissions are mandatory.
 - **`guidance-speckit-development`** (Mode 3) — runs a feature from scratch through the complete Spec-Kit SDD cycle (`specify` → `clarify` → `plan` → `checklist` → `tasks` → `analyze` → `implement` → `converge`) on the artifact-bound `spec-kit-development` workflow variant. Each phase exit is fail-closed: the gate blocks until the expected artifact exists and imports cleanly.
+- **`feature-requirements`** — guides a structured feature-requirements session and integrates the confirmed requirements into the active Spec-Kit `spec.md` before clarification or planning begins.
 
 ### Product refinement
 

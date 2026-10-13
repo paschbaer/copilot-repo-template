@@ -16,13 +16,21 @@ imported plan task by task. The workflow itself stays the default
 2. Locate and import the feature (task tools FAIL without import):
    `discover_spec_kit_feature` (only if the feature id is unknown) →
    `import_spec_kit_artifacts { featureId }` → creates a hash-pinned snapshot.
-3. Task loop (repeat until no ready tasks remain):
-   `get_next_task` → `release_batch { mode: "single"|"batch"|"allReady" }` →
-   `start_task { batchId, taskIds }` → implement →
-   `submit_task_implementation { evidence: [...] }` (changedFiles, tests; a
-   checkbox in tasks.md is a hint, NEVER proof) →
-   `submit_task_review { findings }` → `verify_task { taskId, succeeded, executions }` →
-   `complete_task { taskId }`.
+3. Task loop (repeat until no ready tasks remain). Two levels —
+   implementation and review are BATCH calls (one submission covers all
+   tasks of the batch), only verification and completion are per task:
+   - Batch level:
+     `get_next_task` → `release_batch { mode: "single"|"batch"|"allReady" }` →
+     `start_task { batchId, taskIds[] }` → implement →
+     `submit_task_implementation { evidence: [...] }` — ONE call for the whole
+     batch, one evidence item PER TASK (`taskId`, summary, changedFiles, tests;
+     a checkbox in tasks.md is a hint, NEVER proof) →
+     `submit_task_review { findings: [...] }` — ONE review for the whole batch;
+     each finding carries `taskIds[]` (may span multiple tasks), `severity`,
+     `fixRequired`, `fixApplied`; blocking findings gate completion.
+   - Task level (per task):
+     `verify_task { taskId, succeeded, executions }` →
+     `complete_task { taskId }`.
 4. Plan deviations: NEVER edit artifacts silently — `propose_plan_change`
    (minor/major classification) → user decision → `approve_plan_change` →
    `apply_plan_change`, then `refresh_spec_kit_artifacts`.
