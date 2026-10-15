@@ -12,12 +12,15 @@
     Run all uv/Python calls in a .venv inside the target repository.
 .PARAMETER Beads
     Install beads (bd) if missing, then run bd init and bd setup copilot.
+.PARAMETER Integration
+    Integration passed to specify init (default: generic, which also appends --integration-options="--commands-dir .agents").
 .PARAMETER Help
     Show usage information.
 #>
 param(
     [string]$Author = "",
     [string]$Email = "",
+    [string]$Integration = "",
     [switch]$Venv,
     [switch]$Beads,
     [switch]$Analyze,
@@ -30,7 +33,8 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $TargetDir = (Get-Location).Path
 
 function Write-Usage {
-    Write-Host "Usage: install.ps1 [-Author NAME] [-Email EMAIL] [-Venv] [-Beads] [-Analyze]"
+    Write-Host "Usage: install.ps1 [-Author NAME] [-Email EMAIL] [-Integration NAME] [-Venv] [-Beads] [-Analyze]"
+    Write-Host "  -Integration NAME  Integration passed to specify init (default: generic, which also appends --integration-options=""--commands-dir .agents"")."
     Write-Host "  -Venv     Run all uv/Python calls in a .venv inside the target repository."
     Write-Host "  -Beads    Install beads (bd) if missing, then run bd init and bd setup copilot."
     Write-Host "  -Analyze  Also initialize GitNexus (gitnexus setup and gitnexus analyze) in the target repository."
@@ -374,7 +378,12 @@ function Initialize-SpecKit {
     Push-Location $TargetDir
     try {
         if (-not (Test-Path -LiteralPath '.specify' -PathType Container)) {
-            & $specifyCmd init --here --integration copilot
+            if ([string]::IsNullOrEmpty($Integration)) {
+                & $specifyCmd init --here --integration generic --integration-options="--commands-dir .agents"
+            }
+            else {
+                & $specifyCmd init --here --integration $Integration
+            }
             if ($LASTEXITCODE -ne 0) {
                 Write-Error "ERROR: specify init failed."
                 exit 1

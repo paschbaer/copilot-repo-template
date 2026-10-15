@@ -12,9 +12,11 @@ VENV_DIR=""
 VENV_PYTHON=""
 BEADS_ENABLED=0
 ANALYZE_ENABLED=0
+INTEGRATION=""
 
 usage() {
-  printf 'Usage: install.sh [--author NAME] [--email EMAIL] [--venv] [--beads] [--analyze]\n'
+  printf 'Usage: install.sh [--author NAME] [--email EMAIL] [--integration NAME] [--venv] [--beads] [--analyze]\n'
+  printf '  --integration NAME  Integration passed to specify init (default: generic, which also appends --integration-options="--commands-dir .agents").\n'
   printf '  --venv    Run all uv/Python calls in a .venv inside the target repository.\n'
   printf '  --beads   Install beads (bd) if missing, then run bd init and bd setup copilot.\n'
   printf '  --analyze Also initialize GitNexus (gitnexus setup and gitnexus analyze) in the target repository.\n'
@@ -30,6 +32,11 @@ while [[ $# -gt 0 ]]; do
     --email)
       [[ $# -ge 2 ]] || { printf 'ERROR: --email requires a value.\n' >&2; usage; exit 1; }
       GIT_AUTHOR_EMAIL="$2"
+      shift 2
+      ;;
+    --integration)
+      [[ $# -ge 2 ]] || { printf 'ERROR: --integration requires a value.\n' >&2; usage; exit 1; }
+      INTEGRATION="$2"
       shift 2
       ;;
     --venv)
@@ -391,7 +398,11 @@ initialize_speck_kit() {
     cd -- "$TARGET_DIR"
 
     if [[ ! -d ".specify" ]]; then
-      "$specify_cmd" init --here --integration copilot
+      if [[ -z "$INTEGRATION" ]]; then
+        "$specify_cmd" init --here --integration generic --integration-options="--commands-dir .agents"
+      else
+        "$specify_cmd" init --here --integration "$INTEGRATION"
+      fi
     else
       printf 'SKIP: Spec Kit already appears to be initialized.\n'
     fi

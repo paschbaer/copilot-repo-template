@@ -113,6 +113,21 @@ To set the git attributes for *Author* and *E-Mail* call the script this way:
 
 GitNexus is always installed when missing, but its initialization (`gitnexus setup` and `gitnexus analyze` in the target repository) runs only when `--analyze` is passed. Use it when the repository should be indexed for code-intelligence queries right away; omit it for a plain configuration install.
 
+#### Spec Kit integration (`--integration`)
+
+The `--integration` option controls the value passed to `specify init --integration` during Spec Kit initialization in the target repository. For example:
+
+```bash
+../copilot-repo-template/install.sh --integration copilot
+```
+
+If the option is not set, the integration defaults to `generic`. In that case the installer additionally appends `--integration-options="--commands-dir .agents"` to the `specify init` call so that the generated commands are placed in `.agents`:
+
+- `--integration` unset → `specify init --here --integration generic --integration-options="--commands-dir .agents"`
+- `--integration copilot` → `specify init --here --integration copilot` (no extra options)
+
+On Windows the equivalent parameter is `-Integration` (e.g. `install.ps1 -Integration copilot`).
+
 #### Virtual environment mode (`--venv`)
 
 Add the `--venv` option to run all `uv`/Python calls in a virtual environment associated with the target repository:
@@ -200,6 +215,7 @@ Options mirror `install.sh`; PowerShell uses named parameters:
 
 Platform notes:
 
+- `-Integration NAME` controls the value passed to `specify init --integration`; if unset, it defaults to `generic` and the installer additionally appends `--integration-options="--commands-dir .agents"` (see the Bash section above).
 - `-Venv` creates the same `.venv` in the target repository (uv-managed Python, never recreated); Spec Kit is installed via `uv pip install --python` and `specify init` runs through the venv entry point resolved from `Scripts\`.
 - `-Beads` checks for the `bd` CLI and, if missing, installs beads via winget (`GasTownHall.Beads`) with the npm fallback (`npm install --global @beads/bd`); `bd init` (skipped when `.beads/` exists) and `bd setup copilot` then run in the target repository, exactly as under Bash.
 - npm/npx are checked before GitNexus; when missing, Node.js is bootstrapped via fnm (winget `Schniz.fnm`, then `fnm install --lts`) — the lightest per-user install, no administrator rights.
