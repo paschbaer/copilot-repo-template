@@ -6,6 +6,7 @@
 - **Ask, Don't Assume**: When requirements are unclear or a decision is pending, ask the user concretely: present the available action options with their trade-offs, name a recommendation, and wait for the user's answer before continuing. Do not decide unilaterally.
 - **File Deletion**: Ask for approval before deleting files you haven't created yourself.
 - **Communication**: Keep explanations concise.
+- **Language**: Communicate with the user in **German**. All artifacts — code, identifiers, comments, documentation, commit messages, prompts, configs, and generated files — are ALWAYS written in **English**.
 
 ## SOLID Principles (binding)
 - **SRP — Single Responsibility:** one module/class = one responsibility and one reason to change. Generalizes the existing rule "keep strategy logic isolated by module responsibility"; applies to every `servers/*` project (e.g. state holding, (de-)serialization and reporting are separate concerns).
