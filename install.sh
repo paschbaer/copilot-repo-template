@@ -95,6 +95,21 @@ configure_git_author() {
   fi
 }
 
+fix_gitnexus_project_name() {
+  local agents_md="$TARGET_DIR/AGENTS.md"
+  local project_name
+  project_name="$(basename "$TARGET_DIR")"
+
+  if [[ ! -f "$agents_md" ]]; then
+    return 0
+  fi
+
+  if grep -q 'indexed by GitNexus as \*\*copilot-repo-template\*\*' "$agents_md"; then
+    sed -i "/indexed by GitNexus/s/copilot-repo-template/$project_name/" "$agents_md"
+    printf 'FIX: Rewrote GitNexus project name in AGENTS.md to %s.\n' "$project_name"
+  fi
+}
+
 copy_file_if_missing() {
   local source="$1"
   local target="$2"
@@ -416,6 +431,7 @@ configure_git_author
 
 copy_directory_contents "$SCRIPT_DIR/.github" "$TARGET_DIR/.github"
 copy_file_if_missing "$SCRIPT_DIR/AGENTS.md" "$TARGET_DIR/AGENTS.md"
+fix_gitnexus_project_name
 copy_directory_contents "$SCRIPT_DIR/.vscode" "$TARGET_DIR/.vscode"
 copy_file_if_missing "$SCRIPT_DIR/.gitignore" "$TARGET_DIR/.gitignore"
 copy_directory_contents "$SCRIPT_DIR/.github/skills" "$TARGET_DIR/.agents/skills"

@@ -81,6 +81,22 @@ function Copy-FileIfMissing {
     Write-Host ("COPY: {0}" -f $relativeTarget)
 }
 
+function Repair-GitNexusProjectName {
+    $agentsMd = Join-Path $TargetDir 'AGENTS.md'
+    if (-not (Test-Path -LiteralPath $agentsMd -PathType Leaf)) {
+        return
+    }
+
+    $projectName = Split-Path -Path $TargetDir -Leaf
+    $content = Get-Content -LiteralPath $agentsMd -Raw
+    $pattern = 'indexed by GitNexus as \*\*copilot-repo-template\*\*'
+    if ($content -match $pattern) {
+        $content = $content -replace 'indexed by GitNexus as \*\*copilot-repo-template\*\*', "indexed by GitNexus as **$projectName**"
+        Set-Content -LiteralPath $agentsMd -Value $content -NoNewline
+        Write-Host ("FIX: Rewrote GitNexus project name in AGENTS.md to {0}." -f $projectName)
+    }
+}
+
 function Copy-DirectoryContents {
     param([string]$SourceDir, [string]$TargetDirParam)
 
@@ -481,6 +497,7 @@ Configure-GitAuthor
 
 Copy-DirectoryContents -SourceDir (Join-Path $ScriptDir '.github') -TargetDirParam (Join-Path $TargetDir '.github')
 Copy-FileIfMissing -Source (Join-Path $ScriptDir 'AGENTS.md') -Target (Join-Path $TargetDir 'AGENTS.md')
+Repair-GitNexusProjectName
 Copy-DirectoryContents -SourceDir (Join-Path $ScriptDir '.vscode') -TargetDirParam (Join-Path $TargetDir '.vscode')
 Copy-FileIfMissing -Source (Join-Path $ScriptDir '.gitignore') -Target (Join-Path $TargetDir '.gitignore')
 Copy-DirectoryContents -SourceDir (Join-Path $ScriptDir '.github/skills') -TargetDirParam (Join-Path $TargetDir '.agents/skills')
