@@ -84,6 +84,32 @@ function Copy-FileIfMissing {
     Write-Host ("COPY: {0}" -f $relativeTarget)
 }
 
+function Copy-AgentsMd {
+    $source = Join-Path $ScriptDir 'AGENTS.md'
+    $target = Join-Path $TargetDir 'AGENTS.md'
+
+    if (-not (Test-Path -LiteralPath $source -PathType Leaf)) {
+        Write-Host ("SKIP: Source file {0} does not exist." -f $source)
+        return $false
+    }
+
+    if (Test-Path -LiteralPath $target) {
+        $answer = Read-Host "AGENTS.md already exists in the target. Overwrite it with the template version? [y/N]"
+        if ($answer -notmatch '^(y|yes)$') {
+            Write-Host "SKIP: AGENTS.md already exists and was not overwritten."
+            return $false
+        }
+        Copy-Item -LiteralPath $source -Destination $target -Force
+        Write-Host "OVERWRITE: AGENTS.md"
+    }
+    else {
+        Copy-Item -LiteralPath $source -Destination $target
+        Write-Host "COPY: AGENTS.md"
+    }
+
+    return $true
+}
+
 function Repair-GitNexusProjectName {
     $agentsMd = Join-Path $TargetDir 'AGENTS.md'
     if (-not (Test-Path -LiteralPath $agentsMd -PathType Leaf)) {
@@ -125,10 +151,10 @@ This project uses a uv-managed virtual environment at ``.venv/`` for Python **an
 
     $anchor = '## SOLID Principles (binding)'
     if ($content.Contains($anchor)) {
-        $content = $content.Replace($anchor, $section.TrimStart() + "`n" + $anchor)
+        $content = $content.Replace($anchor, $section.TrimStart() + "`n`n" + $anchor)
     }
     else {
-        $content = $content.TrimEnd() + "`n" + $section.TrimStart()
+        $content = $content.TrimEnd() + "`n`n" + $section.TrimStart()
     }
 
     Set-Content -LiteralPath $agentsMd -Value $content -NoNewline
@@ -211,32 +237,52 @@ function Install-NodeViaNodeenv {
 }
 
 function Install-GitNexus {
-    Write-Host "CHECK: Looking for an existing GitNexus installation..."
-
-    if (Test-CommandAvailable -Name 'gitnexus') {
-        Write-Host ("SKIP: GitNexus is already installed at {0}." -f (Get-Command gitnexus).Source)
-        gitnexus --version
-        return
+    $venvNpm = Join-Path $script:VenvDir 'Scripts\npm.cmd'
+    if (-not (Test-Path -LiteralPath $venvNpm -PathType Leaf)) {
+        $venvNpm = Join-Path $script:VenvDir 'Scripts\npm'
     }
 
-    if (-not (Test-CommandAvailable -Name 'npm')) {
-        Write-Error "ERROR: npm is required to install GitNexus but was not found."
-        Write-Error "ERROR: Install Node.js and npm, then run this script again."
+    if (-not (Test-Path -LiteralPath $venvNpm -PathType Leaf)) {
+        Write-Error ("ERROR: npm was not found in the virtual environment {0}." -f $script:VenvDir)
+        Write-Error "ERROR: Node.js is provisioned by nodeenv; re-run the script or install nodeenv manually (uv pip install nodeenv && nodeenv -p --node=24)."
         exit 1
     }
 
-    Write-Host "INSTALL: GitNexus was not found. Installing it globally with npm..."
-    npm install --global gitnexus@latest
+    Write-Host "CHECK: Looking for an existing GitNexus installation inside the virtual environment..."
+
+    $venvGitnexus = Join-Path $script:VenvDir 'Scripts\gitnexus.cmd'
+    if (-not (Test-Path -LiteralPath $venvGitnexus -PathType Leaf)) {
+        $venvGitnexus = Join-Path $script:VenvDir 'Scripts\gitnexus'
+    }
+
+    if (Test-Path -LiteralPath $venvGitnexus -PathType Leaf) {
+        Write-Host ("SKIP: GitNexus is already installed in the virtual environment ({0})." -f $venvGitnexus)
+        & $venvGitnexus --version
+        return
+    }
+
+    Write-Host "INSTALL: GitNexus was not found. Installing it into the virtual environment with npm..."
+    & $venvNpm install --global gitnexus@latest
     if ($LASTEXITCODE -ne 0) {
         Write-Error "ERROR: The GitNexus installation failed."
         exit 1
     }
-    Write-Host "INSTALL: GitNexus installation completed."
+    Write-Host "INSTALL: GitNexus installation completed (inside the virtual environment)."
 }
 
 function Initialize-GitNexus {
+    $gitnexusCmd = Join-Path $script:VenvDir 'Scripts\gitnexus.cmd'
+    if (-not (Test-Path -LiteralPath $gitnexusCmd -PathType Leaf)) {
+        $gitnexusCmd = Join-Path $script:VenvDir 'Scripts\gitnexus'
+    }
+
+    if (-not (Test-Path -LiteralPath $gitnexusCmd -PathType Leaf)) {
+        Write-Error ("ERROR: gitnexus was not found in the virtual environment {0}." -f $script:VenvDir)
+        exit 1
+    }
+
     Write-Host "INIT: Configuring GitNexus MCP integrations..."
-    gitnexus setup
+    & $gitnexusCmd setup
     if ($LASTEXITCODE -ne 0) {
         Write-Error "ERROR: gitnexus setup failed."
         exit 1
@@ -245,7 +291,7 @@ function Initialize-GitNexus {
     Write-Host ("INIT: Analyzing repository {0}..." -f $TargetDir)
     Push-Location $TargetDir
     try {
-        gitnexus analyze
+        & $gitnexusCmd analyze
         if ($LASTEXITCODE -ne 0) {
             Write-Error "ERROR: gitnexus analyze failed."
             exit 1
@@ -453,15 +499,12 @@ Ensure-GitRepository
 Configure-GitAuthor
 
 Copy-DirectoryContents -SourceDir (Join-Path $ScriptDir '.github') -TargetDirParam (Join-Path $TargetDir '.github')
-Copy-FileIfMissing -Source (Join-Path $ScriptDir 'AGENTS.md') -Target (Join-Path $TargetDir 'AGENTS.md')
+$agentsMdCopied = Copy-AgentsMd
 Repair-GitNexusProjectName
 Copy-DirectoryContents -SourceDir (Join-Path $ScriptDir '.vscode') -TargetDirParam (Join-Path $TargetDir '.vscode')
 Copy-FileIfMissing -Source (Join-Path $ScriptDir '.gitignore') -Target (Join-Path $TargetDir '.gitignore')
 Copy-DirectoryContents -SourceDir (Join-Path $ScriptDir '.github/skills') -TargetDirParam (Join-Path $TargetDir '.agents/skills')
 Copy-DirectoryContents -SourceDir (Join-Path $ScriptDir 'memory-bank-template') -TargetDirParam (Join-Path $TargetDir 'memory-bank')
-
-$agentsMdTarget = Join-Path $TargetDir 'AGENTS.md'
-$agentsMdCopied = -not (Test-Path -LiteralPath $agentsMdTarget)
 
 Ensure-Uv
 New-ProjectVenv

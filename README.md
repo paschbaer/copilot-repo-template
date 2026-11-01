@@ -232,7 +232,8 @@ Wait for the script to finish, then follow the shared review, validation, and co
 
 - It creates a `.venv` upfront (`uv venv`) and installs Spec Kit into it (`uv pip install --python .venv\Scripts\python.exe specify-cli`); `specify init` always runs through the venv entry point. The `-Venv` switch does not exist in this variant.
 - Node.js is **not** bootstrapped system-wide via fnm. Instead, `nodeenv` is installed into the venv (`uv pip install nodeenv`) and Node.js 24 is provisioned inside it (`nodeenv -p --node=24`). While the venv is activated, `node`/`npm`/`npx` resolve to `.venv\Scripts`.
-- When `AGENTS.md` is copied by this script into the target repository, an `Environment` section documenting this venv usage is inserted after the Working Rules. `AGENTS.md` copied by `install.ps1`/`install.sh` does not get this section.
+- GitNexus is installed **inside the venv** as well (`npm install --global gitnexus@latest` with the venv's npm); both installation (`gitnexus`) and initialization (`gitnexus setup`, `gitnexus analyze`) use the venv entry points.
+- When `AGENTS.md` is copied by this script into the target repository, an `Environment` section documenting this venv usage is inserted after the Working Rules. If `AGENTS.md` already exists, the script asks whether to overwrite it; the section is only inserted when the file comes from this script (fresh copy or confirmed overwrite). `AGENTS.md` copied by `install.ps1`/`install.sh` does not get this section.
 
 Usage:
 
