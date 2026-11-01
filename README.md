@@ -226,6 +226,22 @@ Platform notes:
 
 Wait for the script to finish, then follow the shared review, validation, and commit steps below — they apply to both platforms.
 
+### Alternative: `install-venv.ps1` (venv-managed Python and Node.js)
+
+`install-venv.ps1` is a variant of `install.ps1` that **always** uses a virtual environment in the target repository:
+
+- It creates a `.venv` upfront (`uv venv`) and installs Spec Kit into it (`uv pip install --python .venv\Scripts\python.exe specify-cli`); `specify init` always runs through the venv entry point. The `-Venv` switch does not exist in this variant.
+- Node.js is **not** bootstrapped system-wide via fnm. Instead, `nodeenv` is installed into the venv (`uv pip install nodeenv`) and Node.js 24 is provisioned inside it (`nodeenv -p --node=24`). While the venv is activated, `node`/`npm`/`npx` resolve to `.venv\Scripts`.
+- When `AGENTS.md` is copied by this script into the target repository, an `Environment` section documenting this venv usage is inserted after the Working Rules. `AGENTS.md` copied by `install.ps1`/`install.sh` does not get this section.
+
+Usage:
+
+```powershell
+..\copilot-repo-template\install-venv.ps1 -Author "paschbaer" -Email "paschbaer@users.noreply.github.com" -Beads -Analyze
+```
+
+Supported parameters: `-Author`, `-Email`, `-Integration`, `-Beads`, `-Analyze` (same semantics as `install.ps1`). `uv` is required — if it cannot be bootstrapped, the script aborts.
+
 ## Reviewing, Validating, and Committing (both platforms)
 
 ### 1. Wait for the installation to finish
