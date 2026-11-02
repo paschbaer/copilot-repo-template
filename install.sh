@@ -104,8 +104,8 @@ fix_gitnexus_project_name() {
     return 0
   fi
 
-  if grep -q 'indexed by GitNexus as \*\*copilot-repo-template\*\*' "$agents_md"; then
-    sed -i "/indexed by GitNexus/s/copilot-repo-template/$project_name/" "$agents_md"
+  if grep -q 'copilot-repo-template' "$agents_md"; then
+    sed -i "s/copilot-repo-template/$project_name/g" "$agents_md"
     printf 'FIX: Rewrote GitNexus project name in AGENTS.md to %s.\n' "$project_name"
   fi
 }
@@ -443,6 +443,8 @@ install_gitnexus
 
 if [[ "$ANALYZE_ENABLED" -eq 1 ]]; then
   initialize_gitnexus
+  # gitnexus analyze writes its project name into AGENTS.md, so repair afterwards
+  fix_gitnexus_project_name
 fi
 
 ensure_uv

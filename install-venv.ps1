@@ -122,9 +122,8 @@ function Repair-GitNexusProjectName {
 
     $projectName = Split-Path -Path $TargetDir -Leaf
     $content = Get-Content -LiteralPath $agentsMd -Raw
-    $pattern = 'indexed by GitNexus as \*\*copilot-repo-template\*\*'
-    if ($content -match $pattern) {
-        $content = $content -replace 'indexed by GitNexus as \*\*copilot-repo-template\*\*', "indexed by GitNexus as **$projectName**"
+    if ($content -match 'copilot-repo-template') {
+        $content = $content -replace 'copilot-repo-template', $projectName
         Set-Content -LiteralPath $agentsMd -Value $content -NoNewline
         Write-Host ("FIX: Rewrote GitNexus project name in AGENTS.md to {0}." -f $projectName)
     }
@@ -521,6 +520,8 @@ Install-GitNexus
 
 if ($Analyze) {
     Initialize-GitNexus
+    # gitnexus analyze writes its project name into AGENTS.md, so repair afterwards
+    Repair-GitNexusProjectName
 }
 
 Install-SpecKit
