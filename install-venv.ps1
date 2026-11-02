@@ -31,6 +31,10 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# Suppress uv's hardlink warning: cache and target often sit on different filesystems,
+# so tell uv to fall back to copying packages without printing a warning.
+$env:UV_LINK_MODE = 'copy'
+
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $TargetDir = (Get-Location).Path
 
