@@ -38,6 +38,13 @@ enforcing artifact existence at each phase exit.
 4. Strict batch cadence in implement: submissions carry the current batch;
    review decides `implementation_changes_required` (loop) /
    `batch_approved_more_pending` (next batch) / `submission_valid`.
+   Parallel execution in implement (when tasks.md carries parallelization
+   metadata): compile the batch with the `task-compiler` skill, then execute
+   each wave via the `agent-scheduler` skill — the current agent is the
+   orchestrator and spawns AT MOST 3 parallel subagents, each running one
+   task as a guidance workflow in its own worktree. The orchestrator session
+   keeps making ALL guidance submissions (batch evidence, review,
+   `verify_task`, `complete_task`); the workflow gates run unchanged.
 5. Converge loop in verify: a byte-identical tasks.md after
    `speckit.converge` completes; a new `## Phase N: Convergence` section
    loops back to implement — call `refresh_spec_kit_artifacts` FIRST.

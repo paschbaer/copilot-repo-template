@@ -37,6 +37,23 @@ imported plan task by task. The workflow itself stays the default
    - Task level (per task):
      `verify_task { taskId, succeeded, executions }` →
      `complete_task { taskId }`.
+   - Parallel execution (preferred when tasks.md carries parallelization
+     metadata or tasks are wave-parallelizable): the current agent stays the
+     guidance-workflow session owner and dispatches implementation through
+     the skills `task-compiler` and `agent-scheduler`:
+     1. Compile the batch's tasks with `task-compiler` → validated
+        `task-graph.json` with waves and write scopes.
+     2. Execute wave by wave with `agent-scheduler`: the current agent acts
+        as orchestrator, prepares worktrees, and spawns AT MOST 3 parallel
+        subagents (`spawn_agent`), each executing exactly one task in its
+        worktree as a guidance workflow (per `guidance-plain-workflow`).
+     3. Collect subagent results; the orchestrator — not the subagents —
+        performs the guidance task-tool submissions above (batch evidence,
+        review, `verify_task`, `complete_task`) from the collected
+        changedFiles/tests. Failed tasks block dependent tasks; a retry is a
+        new subagent session (max 2 attempts).
+     The workflow gates (review, verification, completion) run unchanged on
+     the orchestrator's session — parallelism affects EXECUTION only.
 4. Plan deviations: NEVER edit artifacts silently — `propose_plan_change`
    (minor/major classification) → user decision → `approve_plan_change` →
    `apply_plan_change`, then `refresh_spec_kit_artifacts`.
@@ -49,3 +66,7 @@ imported plan task by task. The workflow itself stays the default
   `refresh_spec_kit_artifacts` reconciles.
 - `complete_task` requires evidence + review + verification + satisfied
   dependencies; the returned `spec_kit_task_*` error names what is missing.
+- Parallel dispatch: never exceed 3 concurrently running subagents; subagents
+  only implement (guidance workflow in their worktree) — ALL task-tool
+  submissions (`submit_task_*`, `verify_task`, `complete_task`) are made by
+  the orchestrator session.
