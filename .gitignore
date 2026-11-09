@@ -9,3 +9,7 @@ AGENTS.md.bak
 
 # Local tool caches
 .dirac-cache/
+
+# Python bytecode caches
+__pycache__/
+*.py[cod]
