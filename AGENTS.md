@@ -30,6 +30,7 @@
 
 ## Architecture
 - Keep responsibilities isolated by clear module boundaries.
+- A strict layered architecture is the goal: each layer may only access the layer directly beneath it, never skip layers or reach upwards.
 - Extend this section with project-specific implementation rules — see the prompt `.github/prompts/fill-agents-md.prompt.md`.
 
 ## 4. Git & Branch Management
