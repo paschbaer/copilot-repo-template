@@ -29,7 +29,8 @@ imported plan task by task. The workflow itself stays the default
    implementation and review are BATCH calls (one submission covers all
    tasks of the batch), only verification and completion are per task:
    - Batch level:
-     `get_next_task` → `release_batch { mode: "single"|"batch"|"allReady" }` →
+     `get_next_task` → `release_batch { mode: "explicit"|"planned"|"single"|"batch" }`
+     (see release-mode selection below) →
      `start_task { batchId, taskIds[] }` → implement →
      `submit_task_implementation { evidence: [...] }` — ONE call for the whole
      batch, one evidence item PER TASK (`taskId`, summary, changedFiles, tests;
@@ -43,6 +44,40 @@ imported plan task by task. The workflow itself stays the default
      next batch. Releasing a second batch early makes the first batch
      permanently unreachable (`spec_kit_task_already_active`); recovery then
      requires the `guidance-batch-record-repair` state surgery.
+   - Release-mode selection (fail-closed — pick the narrowest mode that
+     expresses the intended partition):
+     - `explicit` is the PREFERRED mode for scheduler-driven work:
+       `release_batch { mode: "explicit", batchId, taskIds: ["T003","T004"] }`
+       releases EXACTLY the given ids. Every id is validated before the write
+       (must exist, must not already be released/started, all dependencies
+       completed or verified, no duplicates) — a violation names the task, its
+       status and the missing dependency ids, and NOTHING is released.
+     - `planned` is the alternative when the plan already carries boundaries:
+       send `approvedPlan.batches: [{ id, tasks }]` with the plan review, then
+       `release_batch { mode: "planned", batchId }` releases that batch's ready
+       tasks; while planned batches exist every mode is validated against them.
+     - `single`/`batch`/`phaseGroup` stay available for interactive work;
+       `batch` picks the next ready tasks up to `maxTasks`. When the artifact
+       declares execution waves (`- taskmeta: wave=N` or a `## Wave N` heading),
+       `batch` is WAVE-ALIGNED: it releases only the lowest ready wave and
+       never mixes waves.
+     - Wave coherence is enforced at release time (ADR 0029): a `batch`/`planned`/
+       `phaseGroup`/`allReady` selection whose members span more than one wave
+       is REJECTED immediately (`release_partition_rejected`), not minutes later
+       at `prepare_task_review`; `explicit` remains the authorized override and
+       then reports the spanned waves in `partitionWarnings`.
+     - Every mode is also validated against the dependency closure: each
+       member's transitive dependencies must be released in the same batch or
+       already completed/verified, otherwise the release is rejected with the
+       offending path and the remedy.
+     - `allReady` is FORBIDDEN for orchestrated work — over a wave-carrying
+       artifact it is rejected outright, and without wave metadata it still
+       writes every ready task into one record (the over-release incident
+       class).
+     - Verify the partition immediately after the release: compare the RETURNED
+       `taskIds` with the intended list before calling `start_task`; shrink an
+       oversized record with `repair_release { batchId, taskIds, reason }`
+       instead of editing state.
    - Task level (per task):
      `verify_task { taskId, succeeded, executions }` →
      `complete_task { taskId }`.

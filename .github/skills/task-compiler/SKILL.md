@@ -27,6 +27,13 @@ schemes, both documented in `references/task-metadata.md`:
 - **Native inline scheme** (default, used by `specs/<id>/tasks.md`): a single
   `- taskmeta:` line per task with `files=[]`, `deps=[]`, `exclusive=[]` and
   `est=NNm`. This is the primary scheme.
+- **Wave hint (write-back).** When the compiled task graph yields execution
+  waves, write the wave into the artifact as `wave=N` in the SAME `- taskmeta:`
+  line (e.g. `- taskmeta: files=[src/a.rs] deps=[T001] wave=1 est=30m`) or
+  group tasks under a `## Wave N` heading. The guidance engine reads the wave
+  from `tasks.md` only (ADR 0029) — `task-graph.json` and `execution-waves.md`
+  are not imported, so a wave that is not written back cannot shape batch
+  partitioning.
 - **Fenced `taskmeta` block** (alternate): a fenced ````taskmeta` code block with
   `depends_on`, `write_scope`, `validation`, `agent_profile`, etc.
 
