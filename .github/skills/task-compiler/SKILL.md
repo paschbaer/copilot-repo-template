@@ -21,7 +21,14 @@ Use this skill when the user asks to:
 
 ## Required input
 
-A path to a Spec Kit `tasks.md` file. Tasks intended for orchestration must use the metadata contract in `references/task-metadata.md`.
+A path to a Spec Kit `tasks.md` file. The compiler accepts two metadata
+schemes, both documented in `references/task-metadata.md`:
+
+- **Native inline scheme** (default, used by `specs/<id>/tasks.md`): a single
+  `- taskmeta:` line per task with `files=[]`, `deps=[]`, `exclusive=[]` and
+  `est=NNm`. This is the primary scheme.
+- **Fenced `taskmeta` block** (alternate): a fenced ````taskmeta` code block with
+  `depends_on`, `write_scope`, `validation`, `agent_profile`, etc.
 
 ## Workflow
 
@@ -43,10 +50,10 @@ A path to a Spec Kit `tasks.md` file. Tasks intended for orchestration must use 
 
 The compiler must fail when:
 
+- a task has no `taskmeta` (neither inline nor fenced);
 - a dependency references an unknown task;
 - the dependency graph contains a cycle;
 - two tasks in the same execution wave have overlapping write scopes;
-- a task has no validation command;
 - a task is marked parallel but has no declared write scope;
 - an exclusive resource is claimed concurrently;
 - a task depends on itself.
@@ -56,7 +63,6 @@ The compiler warns when:
 - estimated duration exceeds 60 minutes;
 - maximum attempts exceeds 2;
 - a write scope is repository-wide;
-- a task lacks explicit non-goals;
 - `[P]` disagrees with dependency or scope analysis.
 
 ## Output contract
