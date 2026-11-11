@@ -68,7 +68,7 @@ Items whose exclusive resource is shared run alone — still as a subagent, but 
 
 Every dispatch message must be self-contained and contain these sections (template: `references/dispatch-prompt-template.md`):
 
-1. `## Execution mode` — verbatim block: the subagent registers and uses a **derived temporary workspace name** for its worktree (never the main workspace name), drives phases with plan-level submissions, reads `get_current_guidance` after each transition, and never imports Spec-Kit artifacts or calls any task tool.
+1. `## Execution mode` — verbatim block: the subagent registers and uses a **derived temporary workspace name** for its worktree (never the main workspace name), drives phases with plan-level submissions, reads `get_current_guidance` after each transition, and never imports Spec-Kit artifacts or calls any task tool — explicitly forbidden by name: `import_spec_kit_artifacts`, `release_batch`, `start_task`, `submit_task_implementation`, `prepare_task_review`, `verify_task`, `complete_task`. Reason (verified engine behavior): the spec-kit task machinery is session-scoped and `release_batch` re-points the session's `activeBatchId` on every call while nothing ever clears it — one misplaced call in a plain session creates an active batch record that makes later task-tool sessions of that workspace unreachable and can only be repaired by the `guidance-batch-record-repair` state surgery (operator server stop/start).
 2. `## Task` — the item text from the manifest, including the quoted finding.
 3. `## Context` — the files to read (rules, contract, ADR, affected sources).
 4. `## Worktree` — path, base commit, write scope, and "modify ONLY files inside your write scope".

@@ -37,6 +37,12 @@ imported plan task by task. The workflow itself stays the default
      `submit_task_review { findings: [...] }` — ONE review for the whole batch;
      each finding carries `taskIds[]` (may span multiple tasks), `severity`,
      `fixRequired`, `fixApplied`; blocking findings gate completion.
+     **Serial batch discipline:** `release_batch` re-points the session's
+     `activeBatchId` on EVERY call and nothing ever clears it — finish ALL
+     tasks of the active batch (through `complete_task`) BEFORE releasing the
+     next batch. Releasing a second batch early makes the first batch
+     permanently unreachable (`spec_kit_task_already_active`); recovery then
+     requires the `guidance-batch-record-repair` state surgery.
    - Task level (per task):
      `verify_task { taskId, succeeded, executions }` →
      `complete_task { taskId }`.

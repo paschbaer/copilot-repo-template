@@ -104,6 +104,13 @@ Keinen Guidance-Tool-Call ausführen (auch keine Statusabfragen).
 ## Bekannte Fallstricke
 
 - `release_batch { mode: "allReady" }` ist die Ursache — nie verwenden.
+- Weitere verifizierte Ursache für einen blockierten Batch: ein ZWEITER
+  `release_batch`-Call vor Abschluss des ersten Batches. Jeder Release setzt
+  `activeBatchId` neu (lifecycle.rs), nichts löscht ihn je — der erste Batch
+  wird unerreichbar (`start_task`: "another batch is active"), und seine
+  bereits releaseden Task-IDs können nicht re-released werden. Reparatur:
+  surgischer Edit des Feldes `"activeBatchId"` auf die Ziel-`batchId` — das
+  restliche Record-Set (batches, tasks, review-gate Sidecar) bleibt unangetastet.
 - Nach dem Server-Neustart lädt die Session den gepatchten State; die
   In-Memory-Kopie des LAUFENDEN Prozesses überschreibt Disk-Edits bei
   jedem Tool-Call — deshalb Stop-before-Edit.

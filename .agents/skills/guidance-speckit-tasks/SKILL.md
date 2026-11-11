@@ -14,7 +14,10 @@ imported plan task by task. The workflow itself stays the default
 
 - `start_workflow` takes the workspace's REGISTERED NAME (kebab-case, e.g. `dcfamily`) — never a display name, a host path, or free text from the request.
 - Discover the registered name BEFORE calling: check prior run records, the repository's `.guidance/` configuration, or ask the operator. Do not guess.
-- If the workspace is not yet registered: `registry_register` requires the CONTAINER-visible absolute path — in pool/Docker mode `/workspaces/<repo>`. Windows drive paths (`d:\...`, `D:/...`), relative paths, and `file://` URIs are rejected — do NOT retry path variants; on failure, ask the operator for the registered name or the container path.
+- If the workspace is not yet registered: register it with
+  `registry_register { name: "<kebab-case>", root: "<absolute repository path>" }`
+  — Windows paths are supported (e.g. `D:\repos\cabp`); there is no
+  Docker/pool path indirection. On failure, ask the operator; do not guess.
 
 ## Procedure
 1. `start_workflow { workspace: "<registered-name>", request: "<task>" }`
@@ -34,6 +37,12 @@ imported plan task by task. The workflow itself stays the default
      `submit_task_review { findings: [...] }` — ONE review for the whole batch;
      each finding carries `taskIds[]` (may span multiple tasks), `severity`,
      `fixRequired`, `fixApplied`; blocking findings gate completion.
+     **Serial batch discipline:** `release_batch` re-points the session's
+     `activeBatchId` on EVERY call and nothing ever clears it — finish ALL
+     tasks of the active batch (through `complete_task`) BEFORE releasing the
+     next batch. Releasing a second batch early makes the first batch
+     permanently unreachable (`spec_kit_task_already_active`); recovery then
+     requires the `guidance-batch-record-repair` state surgery.
    - Task level (per task):
      `verify_task { taskId, succeeded, executions }` →
      `complete_task { taskId }`.

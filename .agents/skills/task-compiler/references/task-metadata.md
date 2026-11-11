@@ -1,6 +1,40 @@
 # Spec Kit parallel task metadata contract
 
-Add a fenced `taskmeta` block immediately below each task line.
+The compiler accepts two metadata schemes. The **native inline scheme** is the
+default and matches how `specs/<id>/tasks.md` is written. The **fenced scheme**
+is an alternate with a richer field set.
+
+## Native inline scheme (primary)
+
+Add one `taskmeta:` line immediately below each task line:
+
+```markdown
+- [ ] T004 [P] [US1] Create 18 stub crates + xtask stub
+
+  - taskmeta: files=[crates/*/Cargo.toml, crates/*/src/lib.rs, xtask/src/main.rs] deps=[T001] exclusive=[root Cargo.toml] est=45m
+```
+
+Fields (space-separated `key=value` tokens):
+
+| Field | Required | Meaning |
+|---|---:|---|
+| `files` | yes | Write scope — files/globs the task may modify. Use `[]` when none. |
+| `deps` | yes | Task IDs that must complete first. Use `[]` when empty. Supports ranges: `T024–T029` expands to `T024..T029`. |
+| `exclusive` | no | Logical resources that cannot be changed concurrently (e.g. `root Cargo.toml`, `migrations/`). A comma-free bracket body is one resource name (e.g. `exclusive=[xtask rules]`). |
+| `est` | yes | Estimated minutes, `NNm` (e.g. `est=30m`). |
+
+List values inside `[...]` are comma-separated; a bracketed body with no comma
+is treated as a single item.
+
+The compiler normalizes these to the canonical keys below before writing the
+graph: `files` → `write_scope`, `deps` → `depends_on`,
+`exclusive` → `exclusive_resources`, `est` → `estimated_minutes`. Missing
+optional fields default to: `read_scope=[]`, `validation=[]`,
+`agent_profile=rust-builder`, `max_attempts=2`, `non_goals=[]`.
+
+## Fenced scheme (alternate)
+
+Add a fenced `taskmeta` block immediately below each task line:
 
 ```markdown
 - [ ] T004 [P] [US1] Implement GoalFirstStrategy in `crates/forge-clearthought/src/methods/goal_first.rs`
@@ -26,18 +60,5 @@ Add a fenced `taskmeta` block immediately below each task line.
   ```
 ```
 
-## Supported fields
-
-| Field | Required | Meaning |
-|---|---:|---|
-| `depends_on` | yes | Task IDs that must complete first. Use `[]` when empty. |
-| `write_scope` | yes | Files or glob-like paths the task may modify. |
-| `read_scope` | no | Context paths the agent may inspect. |
-| `exclusive_resources` | no | Logical resources that cannot be changed concurrently. |
-| `validation` | yes | Commands that prove completion. |
-| `agent_profile` | yes | Scheduler adapter/profile name. |
-| `estimated_minutes` | yes | Expected agent runtime. Prefer 15 to 45. |
-| `max_attempts` | yes | Maximum execution attempts. Recommended maximum: 2. |
-| `non_goals` | yes | Explicit scope exclusions. |
-
-The parser supports a deliberately small YAML subset: inline arrays and indented string lists. Avoid nested mappings.
+The parser supports a deliberately small YAML subset: inline arrays and
+indented string lists. Avoid nested mappings.
