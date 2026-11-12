@@ -61,6 +61,26 @@ prompts you write) in **English**.
    stolen anyway: surgical state edit per `guidance-batch-record-repair`
    (requires operator server stop/start) — do NOT try to work around it with
    more releases.
+9. **Release ONLY via explicit compiled-wave membership:** `release_batch`
+   auto modes ("single"/"batch"/"allReady"/"phaseGroup"/"planned") partition
+   by IMMEDIATE dependencies and do NOT guarantee transitive dep closure — a
+   released batch can contain a task whose dependency is left unreleased
+   outside the batch (observed: wave-3 = T013–T017 without T038, on which
+   T016 depends → batch permanently unreviewable). Therefore: take the task
+   IDs VERBATIM from the compiled `execution-waves.md` and release with
+   `mode: "explicit"`. Before releasing, assert the closure invariant for
+   every member: each of its `depends_on` is either in the same release or
+   already `completed`/`verified`. If a wave is too big for one batch,
+   split it explicitly along the same rule.
+10. **Severity discipline (operator rule, 2026-11-11):** reviewers submit
+   blocking/fixRequired findings ONLY for CRITICAL, HIGH and MEDIUM. LOW
+   findings are ALWAYS submitted as `status: "tracked"`, `fixRequired: false`,
+   and the orchestrator persists them in `memory-bank/remaining-work-plan.md`
+   + `activeContext.md` as follow-ups with a trigger point — never spending
+   re-review rounds on LOW attribution. Every finding MUST carry its `taskIds`
+   array on FIRST submission (unattributed findings block per-task completion
+   and burn re-review iterations). Reviewer dispatch prompts must state both
+   rules.
 
 ## Prerequisites (do these before any dispatch)
 

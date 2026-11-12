@@ -22,7 +22,6 @@ Fields (space-separated `key=value` tokens):
 | `deps` | yes | Task IDs that must complete first. Use `[]` when empty. Supports ranges: `T024–T029` expands to `T024..T029`. |
 | `exclusive` | no | Logical resources that cannot be changed concurrently (e.g. `root Cargo.toml`, `migrations/`). A comma-free bracket body is one resource name (e.g. `exclusive=[xtask rules]`). |
 | `est` | yes | Estimated minutes, `NNm` (e.g. `est=30m`). |
-| `wave` | no | Execution wave, bare integer (`wave=1`). The guidance engine reads it from `tasks.md` (`- taskmeta:` line or a `## Wave N` heading) and uses it as the cut boundary for automatic batch releases (ADR 0029). Not read from `task-graph.json`. |
 
 List values inside `[...]` are comma-separated; a bracketed body with no comma
 is treated as a single item.
