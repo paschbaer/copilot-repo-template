@@ -29,20 +29,34 @@ imported plan task by task. The workflow itself stays the default
    implementation and review are BATCH calls (one submission covers all
    tasks of the batch), only verification and completion are per task:
    - Batch level:
-     `get_next_task` → `release_batch { mode: "single"|"batch"|"allReady" }` →
-     `start_task { batchId, taskIds[] }` → implement →
+     `get_next_task` → `release_batch { mode: "explicit" per compiled wave,
+     asserting dep closure }` → `start_task { batchId, taskIds[] }` →
+     implement →
      `submit_task_implementation { evidence: [...] }` — ONE call for the whole
      batch, one evidence item PER TASK (`taskId`, summary, changedFiles, tests;
      a checkbox in tasks.md is a hint, NEVER proof) →
      `submit_task_review { findings: [...] }` — ONE review for the whole batch;
      each finding carries `taskIds[]` (may span multiple tasks), `severity`,
      `fixRequired`, `fixApplied`; blocking findings gate completion.
+     **Severity discipline (operator rule):** only CRITICAL/HIGH/MEDIUM are
+     blocking; LOW findings are always `tracked` + `fixRequired: false` and
+     go to the memory-bank follow-ups instead of review rounds. Every finding
+     carries `taskIds[]` on FIRST submission — unattributed findings block
+     per-task completion and burn re-review iterations (limit is config:
+     `specKit.taskReview.maxReReviewIterations` in `.guidance/guidance.json`).
      **Serial batch discipline:** `release_batch` re-points the session's
      `activeBatchId` on EVERY call and nothing ever clears it — finish ALL
      tasks of the active batch (through `complete_task`) BEFORE releasing the
      next batch. Releasing a second batch early makes the first batch
      permanently unreachable (`spec_kit_task_already_active`); recovery then
      requires the `guidance-batch-record-repair` state surgery.
+     **Dep-closure rule:** auto partition modes do NOT guarantee transitive
+     dependency closure (a batch member's dependency can stay unreleased
+     outside the batch, making the batch permanently unreviewable). When
+     tasks.md carries taskmeta, release with `mode: "explicit"` using the
+     compiled wave membership verbatim, and assert before releasing: every
+     `depends_on` of every member is in the batch or already
+     `completed`/`verified`.
    - Task level (per task):
      `verify_task { taskId, succeeded, executions }` →
      `complete_task { taskId }`.
